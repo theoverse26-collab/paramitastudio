@@ -216,7 +216,7 @@ const Marketplace = () => {
                       </div>
 
                       <Link to={`/games/${game.id}`}>
-                        <Button variant="ghost" className="w-full mt-2 text-accent hover:text-accent/80">
+                        <Button variant="ghost" className="w-full mt-2 hover:bg-accent/10">
                           View Details
                         </Button>
                       </Link>
