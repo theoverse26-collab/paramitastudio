@@ -17,7 +17,11 @@ const About = () => {
           y: 0
         }} className="text-center max-w-4xl mx-auto">
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gradient-gold uppercase">
-              About Paramita Studio  
+              
+              About Paramita Studio
+  
+ 
+              
  
             </h1>
             <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed">
