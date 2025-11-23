@@ -22,6 +22,7 @@ export type Database = {
           features: string[]
           file_url: string | null
           genre: string
+          hero_image_url: string | null
           id: string
           image_url: string
           long_description: string
@@ -39,6 +40,7 @@ export type Database = {
           features?: string[]
           file_url?: string | null
           genre: string
+          hero_image_url?: string | null
           id?: string
           image_url: string
           long_description: string
@@ -56,6 +58,7 @@ export type Database = {
           features?: string[]
           file_url?: string | null
           genre?: string
+          hero_image_url?: string | null
           id?: string
           image_url?: string
           long_description?: string
