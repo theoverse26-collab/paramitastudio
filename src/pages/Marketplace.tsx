@@ -1,12 +1,121 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { gamesData } from "@/data/gamesData";
 import { ShoppingCart, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+
+interface Game {
+  id: string;
+  title: string;
+  genre: string;
+  description: string;
+  price: number;
+  image_url: string;
+}
 
 const Marketplace = () => {
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [purchasing, setPurchasing] = useState<string | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchGames();
+  }, []);
+
+  const fetchGames = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('id, title, genre, description, price, image_url')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setGames(data || []);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: 'Failed to load games',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePurchase = async (gameId: string, price: number) => {
+    if (!user) {
+      toast({
+        title: 'Login Required',
+        description: 'Please login to purchase games',
+      });
+      navigate('/auth');
+      return;
+    }
+
+    setPurchasing(gameId);
+
+    try {
+      // Check if already purchased
+      const { data: existing } = await supabase
+        .from('purchases')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('game_id', gameId)
+        .maybeSingle();
+
+      if (existing) {
+        toast({
+          title: 'Already Owned',
+          description: 'You already own this game',
+        });
+        setPurchasing(null);
+        return;
+      }
+
+      // Create purchase
+      const { error } = await supabase.from('purchases').insert([
+        {
+          user_id: user.id,
+          game_id: gameId,
+          amount: price,
+        },
+      ]);
+
+      if (error) throw error;
+
+      toast({
+        title: 'Purchase Successful!',
+        description: 'Game added to your library',
+      });
+      
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast({
+        title: 'Purchase Failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setPurchasing(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading marketplace...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -28,7 +137,7 @@ const Marketplace = () => {
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {gamesData.map((game, index) => (
+            {games.map((game, index) => (
               <motion.div
                 key={game.id}
                 initial={{ opacity: 0, y: 30 }}
@@ -39,7 +148,7 @@ const Marketplace = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2">
                   <div className="aspect-square">
                     <img
-                      src={game.image}
+                      src={game.image_url}
                       alt={game.title}
                       className="w-full h-full object-cover"
                     />
@@ -58,15 +167,17 @@ const Marketplace = () => {
 
                     <div>
                       <div className="mb-4">
-                        <p className="text-3xl font-bold text-accent">{game.price}</p>
+                        <p className="text-3xl font-bold text-accent">${game.price}</p>
                       </div>
 
                       <div className="flex gap-2">
                         <Button 
                           className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 glow-gold"
+                          onClick={() => handlePurchase(game.id, game.price)}
+                          disabled={purchasing === game.id}
                         >
                           <ShoppingCart className="mr-2" size={18} />
-                          Buy Now
+                          {purchasing === game.id ? 'Processing...' : 'Buy Now'}
                         </Button>
                         <Button 
                           variant="outline" 
@@ -89,35 +200,6 @@ const Marketplace = () => {
             ))}
           </div>
 
-          {/* Cart Summary */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mt-12 bg-card p-8 rounded-xl border border-border max-w-2xl mx-auto"
-          >
-            <h3 className="text-2xl font-bold mb-6">Secure Checkout</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center text-lg">
-                <span className="text-muted-foreground">Subtotal:</span>
-                <span className="font-semibold">$0.00</span>
-              </div>
-              <div className="flex justify-between items-center text-lg">
-                <span className="text-muted-foreground">Tax:</span>
-                <span className="font-semibold">$0.00</span>
-              </div>
-              <div className="border-t border-border pt-4 flex justify-between items-center text-xl">
-                <span className="font-bold">Total:</span>
-                <span className="font-bold text-accent">$0.00</span>
-              </div>
-              <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 glow-gold">
-                Proceed to Checkout
-              </Button>
-              <p className="text-sm text-muted-foreground text-center">
-                Secure payment powered by Alcuinex. All transactions are encrypted.
-              </p>
-            </div>
-          </motion.div>
         </section>
       </div>
 
