@@ -21,14 +21,17 @@ interface Game {
 const Marketplace = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
-  const [purchasing, setPurchasing] = useState<string | null>(null);
+  const [wishlist, setWishlist] = useState<Set<string>>(new Set());
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     fetchGames();
-  }, []);
+    if (user) {
+      fetchWishlist();
+    }
+  }, [user]);
 
   const fetchGames = async () => {
     try {
@@ -50,7 +53,76 @@ const Marketplace = () => {
     }
   };
 
-  const handlePurchase = async (gameId: string, price: number) => {
+  const fetchWishlist = async () => {
+    if (!user) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('wishlist')
+        .select('game_id')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      setWishlist(new Set(data?.map(item => item.game_id) || []));
+    } catch (error) {
+      console.error('Error fetching wishlist:', error);
+    }
+  };
+
+  const toggleWishlist = async (gameId: string) => {
+    if (!user) {
+      toast({
+        title: 'Login Required',
+        description: 'Please login to add games to wishlist',
+      });
+      navigate('/auth');
+      return;
+    }
+
+    const isInWishlist = wishlist.has(gameId);
+
+    try {
+      if (isInWishlist) {
+        const { error } = await supabase
+          .from('wishlist')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('game_id', gameId);
+
+        if (error) throw error;
+
+        setWishlist(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(gameId);
+          return newSet;
+        });
+
+        toast({
+          title: 'Removed from wishlist',
+        });
+      } else {
+        const { error } = await supabase
+          .from('wishlist')
+          .insert({ user_id: user.id, game_id: gameId });
+
+        if (error) throw error;
+
+        setWishlist(prev => new Set([...prev, gameId]));
+
+        toast({
+          title: 'Added to wishlist',
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handlePurchase = (gameId: string) => {
     if (!user) {
       toast({
         title: 'Login Required',
@@ -60,52 +132,7 @@ const Marketplace = () => {
       return;
     }
 
-    setPurchasing(gameId);
-
-    try {
-      // Check if already purchased
-      const { data: existing } = await supabase
-        .from('purchases')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('game_id', gameId)
-        .maybeSingle();
-
-      if (existing) {
-        toast({
-          title: 'Already Owned',
-          description: 'You already own this game',
-        });
-        setPurchasing(null);
-        return;
-      }
-
-      // Create purchase
-      const { error } = await supabase.from('purchases').insert([
-        {
-          user_id: user.id,
-          game_id: gameId,
-          amount: price,
-        },
-      ]);
-
-      if (error) throw error;
-
-      toast({
-        title: 'Purchase Successful!',
-        description: 'Game added to your library',
-      });
-      
-      navigate('/dashboard');
-    } catch (error: any) {
-      toast({
-        title: 'Purchase Failed',
-        description: error.message,
-        variant: 'destructive',
-      });
-    } finally {
-      setPurchasing(null);
-    }
+    navigate(`/payment?gameId=${gameId}`);
   };
 
   if (loading) {
@@ -173,18 +200,18 @@ const Marketplace = () => {
                       <div className="flex gap-2">
                         <Button 
                           className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 glow-gold"
-                          onClick={() => handlePurchase(game.id, game.price)}
-                          disabled={purchasing === game.id}
+                          onClick={() => handlePurchase(game.id)}
                         >
                           <ShoppingCart className="mr-2" size={18} />
-                          {purchasing === game.id ? 'Processing...' : 'Buy Now'}
+                          Buy Now
                         </Button>
                         <Button 
                           variant="outline" 
                           size="icon"
-                          className="border-accent text-foreground hover:bg-accent/10"
+                          className={`border-accent hover:bg-accent/10 ${wishlist.has(game.id) ? 'text-red-500' : 'text-foreground'}`}
+                          onClick={() => toggleWishlist(game.id)}
                         >
-                          <Heart size={18} />
+                          <Heart size={18} fill={wishlist.has(game.id) ? 'currentColor' : 'none'} />
                         </Button>
                       </div>
 
