@@ -164,10 +164,10 @@ const GameDetail = () => {
                 <ArrowLeft size={20} />
                 Back to Games
               </Link>
-              <h1 className="text-5xl md:text-6xl font-bold mb-4 uppercase text-blue-700">
+              <h1 className="text-5xl md:text-6xl font-bold mb-4 uppercase text-sky-950">
                 {game.title}
               </h1>
-              <p className="text-xl font-semibold uppercase tracking-wide text-yellow-400">
+              <p className="text-xl font-semibold uppercase tracking-wide text-blue-900">
                 {game.genre}
               </p>
             </motion.div>
