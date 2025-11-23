@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-
+import { ArrowRight } from "lucide-react";
 interface GameCardProps {
   id: string;
   title: string;
@@ -31,12 +31,14 @@ const GameCard = ({ id, title, genre, description, image, index }: GameCardProps
         to={`/games/${id}`}
         className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 cursor-pointer"
       >
-        <h3 className="text-2xl font-bold text-primary-foreground mb-2">{title}</h3>
-        <p className="text-accent text-sm font-semibold mb-2 uppercase tracking-wide">{genre}</p>
-        <p className="text-primary-foreground/90 text-sm mb-4 line-clamp-3">{description}</p>
-        <span className="inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium bg-accent text-accent-foreground hover:bg-accent/90 glow-gold cursor-pointer">
-          View Details
-        </span>
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="text-2xl font-bold text-primary-foreground mb-2">{title}</h3>
+            <p className="text-accent text-sm font-semibold mb-2 uppercase tracking-wide">{genre}</p>
+            <p className="text-primary-foreground/90 text-sm line-clamp-3">{description}</p>
+          </div>
+          <ArrowRight className="text-accent flex-shrink-0 ml-4 mt-1" size={32} strokeWidth={2.5} />
+        </div>
       </Link>
 
       <div className="p-4 group-hover:opacity-0 transition-opacity duration-300">
