@@ -89,7 +89,7 @@ const Index = () => {
                 </Button>
               </Link>
               <Link to="/about">
-                <Button size="lg" variant="outline" className="border-primary-foreground hover:bg-primary-foreground/10 text-lg px-8 py-6 text-yellow-300">
+                <Button size="lg" variant="outline" className="border-primary-foreground text-lg px-8 py-6 text-yellow-300 bg-slate-50">
                   About Us
                 </Button>
               </Link>
