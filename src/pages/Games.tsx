@@ -1,10 +1,56 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import GameCard from "@/components/GameCard";
-import { gamesData } from "@/data/gamesData";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface Game {
+  id: string;
+  title: string;
+  genre: string;
+  description: string;
+  image_url: string;
+}
 
 const Games = () => {
+  const [games, setGames] = useState<Game[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchGames();
+  }, []);
+
+  const fetchGames = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('games')
+        .select('id, title, genre, description, image_url')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setGames(data || []);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: 'Failed to load games',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading games...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -20,21 +66,20 @@ const Games = () => {
               Our Games
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Explore our collection of immersive fantasy adventures. Each game is crafted with passion 
-              and designed to transport you to extraordinary worlds.
+              Explore our collection of immersive gaming experiences crafted with passion and creativity.
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {gamesData.map((game, index) => (
-              <GameCard
-                key={game.id}
+            {games.map((game, index) => (
+              <GameCard 
+                key={game.id} 
                 id={game.id}
                 title={game.title}
                 genre={game.genre}
                 description={game.description}
-                image={game.image}
-                index={index}
+                image={game.image_url}
+                index={index} 
               />
             ))}
           </div>

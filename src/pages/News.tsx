@@ -1,39 +1,53 @@
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Calendar, User } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+
+interface NewsPost {
+  id: string;
+  title: string;
+  content: string;
+  published_at: string;
+}
 
 const News = () => {
-  const newsArticles = [
-    {
-      title: "Enchanted Realms Receives Major Update",
-      date: "November 15, 2024",
-      author: "Elena Stormwind",
-      excerpt: "We're excited to announce a major content update for Enchanted Realms, featuring new areas, quests, and magical abilities.",
-      category: "Update",
-    },
-    {
-      title: "Behind the Scenes: Creating Skybound Adventures",
-      date: "November 10, 2024",
-      author: "Marcus Ironforge",
-      excerpt: "Join us as we explore the development process behind our latest aerial adventure game and the challenges we overcame.",
-      category: "Development",
-    },
-    {
-      title: "Shadow Warrior: The Dark Fantasy Saga Continues",
-      date: "November 5, 2024",
-      author: "Luna Silvermoon",
-      excerpt: "Discover what's coming next in the Shadow Warrior universe with our roadmap for 2025 and beyond.",
-      category: "Announcement",
-    },
-    {
-      title: "Community Spotlight: Fan Art Contest Winners",
-      date: "November 1, 2024",
-      author: "Community Team",
-      excerpt: "Celebrating the incredible creativity of our community with this month's fan art contest winners.",
-      category: "Community",
-    },
-  ];
+  const [news, setNews] = useState<NewsPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchNews();
+  }, []);
+
+  const fetchNews = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('news')
+        .select('*')
+        .order('published_at', { ascending: false });
+
+      if (error) throw error;
+      setNews(data || []);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: 'Failed to load news',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-muted-foreground">Loading news...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
@@ -47,54 +61,34 @@ const News = () => {
             className="text-center mb-16"
           >
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gradient-gold uppercase">
-              News & Updates
+              Latest News
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Stay up to date with the latest news, updates, and insights from the Alcuinex team.
+              Stay updated with the latest announcements, updates, and events from Alcuinex.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {newsArticles.map((article, index) => (
-              <motion.article
-                key={index}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-card p-8 rounded-xl border border-border hover-lift geometric-clip"
-              >
-                <div className="mb-4">
-                  <span className="inline-block px-4 py-1 bg-accent/20 text-accent rounded-full text-sm font-semibold uppercase tracking-wide">
-                    {article.category}
-                  </span>
-                </div>
-                
-                <h2 className="text-2xl font-bold mb-4 hover:text-accent transition-fantasy">
-                  {article.title}
-                </h2>
-
-                <div className="flex items-center gap-6 text-sm text-muted-foreground mb-4">
-                  <div className="flex items-center gap-2">
-                    <Calendar size={16} />
-                    <span>{article.date}</span>
+          {news.length === 0 ? (
+            <p className="text-center text-muted-foreground">No news posts yet.</p>
+          ) : (
+            <div className="max-w-4xl mx-auto space-y-6">
+              {news.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-card rounded-xl p-8 border border-border hover-lift parchment-card"
+                >
+                  <div className="mb-2 text-sm text-accent font-semibold uppercase tracking-wide">
+                    {new Date(item.published_at).toLocaleDateString()}
                   </div>
-                  <div className="flex items-center gap-2">
-                    <User size={16} />
-                    <span>{article.author}</span>
-                  </div>
-                </div>
-
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  {article.excerpt}
-                </p>
-
-                <button className="text-accent font-semibold hover:underline">
-                  Read More →
-                </button>
-              </motion.article>
-            ))}
-          </div>
+                  <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
+                  <p className="text-muted-foreground whitespace-pre-wrap">{item.content}</p>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </section>
       </div>
 
