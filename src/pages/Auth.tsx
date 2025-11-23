@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 
 const authSchema = z.object({
   email: z.string().email('Invalid email address').max(255, 'Email too long'),
@@ -92,77 +94,81 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
-      >
-        <div className="bg-card border border-border rounded-xl p-8 shadow-elegant">
-          <h1 className="text-3xl font-bold text-center mb-2 text-gradient-gold uppercase">
-            {isLogin ? 'Login' : 'Sign Up'}
-          </h1>
-          <p className="text-center text-muted-foreground mb-6">
-            {isLogin ? 'Welcome back to Alcuinex' : 'Join the Alcuinex community'}
-          </p>
+    <div className="min-h-screen">
+      <Navbar />
+      <div className="flex items-center justify-center bg-background px-4 pt-24 pb-20 min-h-screen">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full max-w-md"
+        >
+          <div className="bg-card border border-border rounded-xl p-8 shadow-elegant">
+            <h1 className="text-3xl font-bold text-center mb-2 text-gradient-gold uppercase">
+              {isLogin ? 'Login' : 'Sign Up'}
+            </h1>
+            <p className="text-center text-muted-foreground mb-6">
+              {isLogin ? 'Welcome back to Alcuinex' : 'Join the Alcuinex community'}
+            </p>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <Input
+                    id="fullName"
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    placeholder="Enter your full name"
+                  />
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label htmlFor="fullName">Full Name</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="fullName"
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  required
                 />
               </div>
-            )}
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                required
-              />
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                disabled={loading}
+              >
+                {loading ? 'Please wait...' : isLogin ? 'Login' : 'Sign Up'}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-accent hover:text-accent/80 text-sm"
+              >
+                {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login'}
+              </button>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
-                required
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
-              disabled={loading}
-            >
-              {loading ? 'Please wait...' : isLogin ? 'Login' : 'Sign Up'}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => setIsLogin(!isLogin)}
-              className="text-accent hover:text-accent/80 text-sm"
-            >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login'}
-            </button>
           </div>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
+      <Footer />
     </div>
   );
 };
