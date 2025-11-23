@@ -64,7 +64,7 @@ const News = () => {
               Latest News
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Stay updated with the latest announcements, updates, and events from Alcuinex.
+              Stay updated with the latest announcements, updates, and events from Paramita Studio.
             </p>
           </motion.div>
 

@@ -194,7 +194,7 @@ const GameDetail = () => {
                 <div className="mt-6 pt-6 border-t border-border space-y-3">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Developer</p>
-                    <p className="font-semibold">Alcuinex Studios</p>
+                    <p className="font-semibold">Paramita Studio</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Release Date</p>

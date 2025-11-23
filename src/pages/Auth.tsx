@@ -77,7 +77,7 @@ const Auth = () => {
         } else {
           toast({
             title: 'Account Created!',
-            description: 'Welcome to Alcuinex.',
+            description: 'Welcome to Paramita Studio.',
           });
           navigate('/dashboard');
         }
@@ -107,7 +107,7 @@ const Auth = () => {
               {isLogin ? 'Login' : 'Sign Up'}
             </h1>
             <p className="text-center text-muted-foreground mb-6">
-              {isLogin ? 'Welcome back to Alcuinex' : 'Join the Alcuinex community'}
+              {isLogin ? 'Welcome back to Paramita Studio' : 'Join the Paramita Studio community'}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">

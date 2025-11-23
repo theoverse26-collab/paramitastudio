@@ -76,8 +76,8 @@ const Contact = () => {
                     <Mail className="w-6 h-6 text-accent flex-shrink-0 mt-1" />
                     <div>
                       <p className="font-semibold mb-1">Email</p>
-                      <p className="text-muted-foreground">contact@alcuinex.com</p>
-                      <p className="text-muted-foreground">support@alcuinex.com</p>
+                      <p className="text-muted-foreground">contact@paramitastudio.com</p>
+                      <p className="text-muted-foreground">support@paramitastudio.com</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -97,7 +97,7 @@ const Contact = () => {
               <div className="bg-card p-8 rounded-xl border border-border">
                 <div className="flex items-center gap-3 mb-4">
                   <Briefcase className="w-8 h-8 text-accent" />
-                  <h2 className="text-3xl font-bold">Join Alcuinex</h2>
+                  <h2 className="text-3xl font-bold">Join Paramita Studio</h2>
                 </div>
                 <p className="text-muted-foreground mb-6">
                   We're always looking for talented individuals who share our passion for creating 
