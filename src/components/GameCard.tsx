@@ -28,16 +28,17 @@ const GameCard = ({ id, title, genre, description, image, index }: GameCardProps
         />
       </div>
       
-      <div className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
+      <Link
+        to={`/games/${id}`}
+        className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6 cursor-pointer"
+      >
         <h3 className="text-2xl font-bold text-primary-foreground mb-2">{title}</h3>
         <p className="text-accent text-sm font-semibold mb-2 uppercase tracking-wide">{genre}</p>
         <p className="text-primary-foreground/90 text-sm mb-4 line-clamp-3">{description}</p>
-        <Link to={`/games/${id}`}>
-          <Button variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90 glow-gold">
-            View Details
-          </Button>
-        </Link>
-      </div>
+        <Button asChild variant="default" className="bg-accent text-accent-foreground hover:bg-accent/90 glow-gold">
+          <span>View Details</span>
+        </Button>
+      </Link>
 
       <div className="p-4 group-hover:opacity-0 transition-opacity duration-300">
         <h3 className="text-xl font-bold mb-1">{title}</h3>
