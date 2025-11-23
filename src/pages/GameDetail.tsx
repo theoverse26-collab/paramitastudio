@@ -18,6 +18,9 @@ interface Game {
   image_url: string;
   features: string[];
   screenshots: string[];
+  developer: string;
+  release_date: string;
+  platform: string;
 }
 
 const GameDetail = () => {
@@ -194,15 +197,15 @@ const GameDetail = () => {
                 <div className="mt-6 pt-6 border-t border-border space-y-3">
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Developer</p>
-                    <p className="font-semibold">Paramita Studio</p>
+                    <p className="font-semibold">{game.developer}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Release Date</p>
-                    <p className="font-semibold">2024</p>
+                    <p className="font-semibold">{game.release_date}</p>
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground mb-1">Platform</p>
-                    <p className="font-semibold">PC, PlayStation, Xbox</p>
+                    <p className="font-semibold">{game.platform}</p>
                   </div>
                 </div>
               </motion.div>

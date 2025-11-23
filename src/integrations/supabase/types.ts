@@ -18,13 +18,16 @@ export type Database = {
         Row: {
           created_at: string
           description: string
+          developer: string
           features: string[]
           file_url: string | null
           genre: string
           id: string
           image_url: string
           long_description: string
+          platform: string
           price: number
+          release_date: string
           screenshots: string[]
           title: string
           updated_at: string
@@ -32,13 +35,16 @@ export type Database = {
         Insert: {
           created_at?: string
           description: string
+          developer?: string
           features?: string[]
           file_url?: string | null
           genre: string
           id?: string
           image_url: string
           long_description: string
+          platform?: string
           price: number
+          release_date?: string
           screenshots?: string[]
           title: string
           updated_at?: string
@@ -46,13 +52,16 @@ export type Database = {
         Update: {
           created_at?: string
           description?: string
+          developer?: string
           features?: string[]
           file_url?: string | null
           genre?: string
           id?: string
           image_url?: string
           long_description?: string
+          platform?: string
           price?: number
+          release_date?: string
           screenshots?: string[]
           title?: string
           updated_at?: string
