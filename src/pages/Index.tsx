@@ -48,7 +48,7 @@ const Index = () => {
           duration: 0.8
         }}>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-primary-foreground mb-6 uppercase tracking-wider">
-              Alcuinex
+              PARAMITA STUDIO  
             </h1>
             <motion.p initial={{
             opacity: 0
