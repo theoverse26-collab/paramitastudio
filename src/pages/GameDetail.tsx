@@ -16,6 +16,7 @@ interface Game {
   long_description: string;
   price: number;
   image_url: string;
+  hero_image_url: string | null;
   features: string[];
   screenshots: string[];
   developer: string;
@@ -85,7 +86,7 @@ const GameDetail = () => {
         <section className="relative h-[60vh] mb-12">
           <div
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${game.image_url})` }}
+            style={{ backgroundImage: `url(${game.hero_image_url || game.image_url})` }}
           >
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
           </div>

@@ -22,6 +22,7 @@ interface Game {
   long_description: string;
   price: number;
   image_url: string;
+  hero_image_url: string | null;
   file_url: string | null;
   developer: string;
   release_date: string;
@@ -44,6 +45,7 @@ const GamesManagement = () => {
     long_description: '',
     price: '',
     image_url: '',
+    hero_image_url: '',
     file_url: '',
     developer: 'Paramita Studio',
     release_date: '2024',
@@ -65,6 +67,7 @@ const GamesManagement = () => {
         long_description: editingGame.long_description,
         price: editingGame.price.toString(),
         image_url: editingGame.image_url,
+        hero_image_url: editingGame.hero_image_url || '',
         file_url: editingGame.file_url || '',
         developer: editingGame.developer,
         release_date: editingGame.release_date,
@@ -80,6 +83,7 @@ const GamesManagement = () => {
         long_description: '',
         price: '',
         image_url: '',
+        hero_image_url: '',
         file_url: '',
         developer: 'Paramita Studio',
         release_date: '2024',
@@ -121,6 +125,7 @@ const GamesManagement = () => {
         long_description: formData.long_description,
         price: parseFloat(formData.price),
         image_url: formData.image_url,
+        hero_image_url: formData.hero_image_url || null,
         file_url: formData.file_url || null,
         developer: formData.developer,
         release_date: formData.release_date,
@@ -262,12 +267,22 @@ const GamesManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="image_url">Image URL</Label>
+                <Label htmlFor="image_url">Game Card Image URL</Label>
                 <Input
                   id="image_url"
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  placeholder="Recommended: 800px width"
                   required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="hero_image_url">Hero Banner Image URL (optional)</Label>
+                <Input
+                  id="hero_image_url"
+                  value={formData.hero_image_url}
+                  onChange={(e) => setFormData({ ...formData, hero_image_url: e.target.value })}
+                  placeholder="Recommended: 1920px width. Falls back to card image if empty."
                 />
               </div>
               <div className="space-y-2">
