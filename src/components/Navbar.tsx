@@ -35,7 +35,7 @@ const Navbar = () => {
             opacity: 1,
             x: 0
           }} className="text-2xl md:text-3xl font-bold tracking-widest text-gradient-gold uppercase text-blue-700">
-              Alcuinex
+              Paramita
             </motion.h1>
           </Link>
 
