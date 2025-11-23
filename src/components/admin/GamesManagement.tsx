@@ -23,6 +23,11 @@ interface Game {
   price: number;
   image_url: string;
   file_url: string | null;
+  developer: string;
+  release_date: string;
+  platform: string;
+  features: string[];
+  screenshots: string[];
 }
 
 const GamesManagement = () => {
@@ -40,6 +45,11 @@ const GamesManagement = () => {
     price: '',
     image_url: '',
     file_url: '',
+    developer: 'Paramita Studio',
+    release_date: '2024',
+    platform: 'PC, PlayStation, Xbox',
+    features: '',
+    screenshots: '',
   });
 
   useEffect(() => {
@@ -56,6 +66,11 @@ const GamesManagement = () => {
         price: editingGame.price.toString(),
         image_url: editingGame.image_url,
         file_url: editingGame.file_url || '',
+        developer: editingGame.developer,
+        release_date: editingGame.release_date,
+        platform: editingGame.platform,
+        features: editingGame.features.join('\n'),
+        screenshots: editingGame.screenshots.join('\n'),
       });
     } else {
       setFormData({
@@ -66,6 +81,11 @@ const GamesManagement = () => {
         price: '',
         image_url: '',
         file_url: '',
+        developer: 'Paramita Studio',
+        release_date: '2024',
+        platform: 'PC, PlayStation, Xbox',
+        features: '',
+        screenshots: '',
       });
     }
   }, [editingGame]);
@@ -102,8 +122,11 @@ const GamesManagement = () => {
         price: parseFloat(formData.price),
         image_url: formData.image_url,
         file_url: formData.file_url || null,
-        features: [],
-        screenshots: [],
+        developer: formData.developer,
+        release_date: formData.release_date,
+        platform: formData.platform,
+        features: formData.features.split('\n').filter(f => f.trim()),
+        screenshots: formData.screenshots.split('\n').filter(s => s.trim()),
       };
 
       if (editingGame) {
@@ -253,6 +276,54 @@ const GamesManagement = () => {
                   id="file_url"
                   value={formData.file_url}
                   onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="developer">Developer</Label>
+                <Input
+                  id="developer"
+                  value={formData.developer}
+                  onChange={(e) => setFormData({ ...formData, developer: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="release_date">Release Date</Label>
+                <Input
+                  id="release_date"
+                  value={formData.release_date}
+                  onChange={(e) => setFormData({ ...formData, release_date: e.target.value })}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="platform">Platform</Label>
+                <Input
+                  id="platform"
+                  value={formData.platform}
+                  onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
+                  placeholder="e.g., PC, PlayStation, Xbox"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="features">Key Features (one per line)</Label>
+                <Textarea
+                  id="features"
+                  value={formData.features}
+                  onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                  rows={5}
+                  placeholder="Epic storyline&#10;Stunning graphics&#10;Multiplayer mode"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="screenshots">Screenshot URLs (one per line)</Label>
+                <Textarea
+                  id="screenshots"
+                  value={formData.screenshots}
+                  onChange={(e) => setFormData({ ...formData, screenshots: e.target.value })}
+                  rows={5}
+                  placeholder="https://example.com/screenshot1.jpg&#10;https://example.com/screenshot2.jpg"
                 />
               </div>
               <Button type="submit" className="w-full">
