@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, User, LogOut } from "lucide-react";
+import { Menu, X, User, LogOut, Heart } from "lucide-react";
 import { NavLink } from "./NavLink";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -28,6 +28,10 @@ const Navbar = () => {
             
             {user ? (
               <>
+                <NavLink to="/wishlist">
+                  <Heart size={18} className="inline mr-1" />
+                  Wishlist
+                </NavLink>
                 <NavLink to={isAdmin ? "/admin" : "/dashboard"}>
                   <User size={18} className="inline mr-1" />
                   {isAdmin ? 'Admin' : 'Dashboard'}
@@ -75,6 +79,7 @@ const Navbar = () => {
             
             {user ? (
               <>
+                <Link to="/wishlist" className="block px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>Wishlist</Link>
                 <Link to={isAdmin ? "/admin" : "/dashboard"} className="block px-4 py-2 text-foreground hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>
                   {isAdmin ? 'Admin' : 'Dashboard'}
                 </Link>

@@ -4,9 +4,10 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ShoppingCart } from "lucide-react";
+import { ArrowLeft, ShoppingCart, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Game {
   id: string;
@@ -28,14 +29,19 @@ const GameDetail = () => {
   const { id } = useParams();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isInWishlist, setIsInWishlist] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (id) {
       fetchGame();
+      if (user) {
+        checkWishlist();
+      }
     }
-  }, [id]);
+  }, [id, user]);
 
   const fetchGame = async () => {
     try {
@@ -63,6 +69,80 @@ const GameDetail = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const checkWishlist = async () => {
+    if (!user || !id) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('wishlist')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('game_id', id)
+        .maybeSingle();
+
+      if (error) throw error;
+      setIsInWishlist(!!data);
+    } catch (error) {
+      console.error('Error checking wishlist:', error);
+    }
+  };
+
+  const toggleWishlist = async () => {
+    if (!user) {
+      toast({
+        title: 'Login Required',
+        description: 'Please login to add games to wishlist',
+      });
+      navigate('/auth');
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        const { error } = await supabase
+          .from('wishlist')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('game_id', id);
+
+        if (error) throw error;
+        setIsInWishlist(false);
+        toast({
+          title: 'Removed from wishlist',
+        });
+      } else {
+        const { error } = await supabase
+          .from('wishlist')
+          .insert({ user_id: user.id, game_id: id });
+
+        if (error) throw error;
+        setIsInWishlist(true);
+        toast({
+          title: 'Added to wishlist',
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handlePurchase = () => {
+    if (!user) {
+      toast({
+        title: 'Login Required',
+        description: 'Please login to purchase games',
+      });
+      navigate('/auth');
+      return;
+    }
+
+    navigate(`/payment?gameId=${id}`);
   };
 
   if (loading) {
@@ -184,15 +264,23 @@ const GameDetail = () => {
                   <p className="text-4xl font-bold text-accent">${game.price}</p>
                 </div>
 
-                <Link to="/marketplace">
-                  <Button size="lg" className="w-full bg-accent text-accent-foreground hover:bg-accent/90 glow-gold mb-3">
-                    <ShoppingCart className="mr-2" size={20} />
-                    Buy Now
-                  </Button>
-                </Link>
+                <Button 
+                  size="lg" 
+                  className="w-full bg-accent text-accent-foreground hover:bg-accent/90 glow-gold mb-3"
+                  onClick={handlePurchase}
+                >
+                  <ShoppingCart className="mr-2" size={20} />
+                  Buy Now
+                </Button>
 
-                <Button size="lg" variant="outline" className="w-full border-accent text-foreground hover:bg-accent/10">
-                  Add to Wishlist
+                <Button 
+                  size="lg" 
+                  variant="outline" 
+                  className={`w-full border-accent hover:bg-accent/10 ${isInWishlist ? 'text-red-500' : 'text-foreground'}`}
+                  onClick={toggleWishlist}
+                >
+                  <Heart className="mr-2" size={20} fill={isInWishlist ? 'currentColor' : 'none'} />
+                  {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
                 </Button>
 
                 <div className="mt-6 pt-6 border-t border-border space-y-3">
