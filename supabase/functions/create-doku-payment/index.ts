@@ -6,8 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Production URL
-const DOKU_API_URL = "https://api.doku.com/checkout/v1/payment";
+// Sandbox URL for testing
+const DOKU_API_URL = "https://api-sandbox.doku.com/checkout/v1/payment";
 
 // Generate HMAC-SHA256 signature per DOKU spec
 async function generateSignature(
