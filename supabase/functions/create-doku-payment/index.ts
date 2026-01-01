@@ -6,7 +6,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const DOKU_SANDBOX_URL = "https://api-sandbox.doku.com/checkout/v1/payment";
+// Production URL
+const DOKU_API_URL = "https://api.doku.com/checkout/v1/payment";
 
 // Generate HMAC-SHA256 signature per DOKU spec
 async function generateSignature(
@@ -61,20 +62,30 @@ serve(async (req) => {
   try {
     const dokuClientId = Deno.env.get("DOKU_CLIENT_ID");
     const dokuSecretKey = Deno.env.get("DOKU_SECRET_KEY");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     
     if (!dokuClientId || !dokuSecretKey) {
       console.error("DOKU credentials not configured");
       throw new Error("Payment gateway not configured");
     }
 
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Supabase credentials not configured");
+      throw new Error("Database not configured");
+    }
+
+    // Create Supabase client with service role
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
     // Parse request body
     const { gameId, amount, gameTitle, userEmail, userId, callbackUrl } = await req.json();
     
-    if (!gameId || !amount) {
-      throw new Error("Missing required fields: gameId, amount");
+    if (!gameId || !amount || !userId) {
+      throw new Error("Missing required fields: gameId, amount, userId");
     }
 
-    console.log(`Creating DOKU payment for game ${gameId}, amount: ${amount} IDR`);
+    console.log(`Creating DOKU payment for game ${gameId}, amount: ${amount} IDR, user: ${userId}`);
 
     // Generate unique request ID
     const requestId = crypto.randomUUID();
@@ -87,6 +98,12 @@ serve(async (req) => {
     
     // Request target (path only)
     const requestTarget = "/checkout/v1/payment";
+
+    // Get origin for callback URLs
+    const origin = req.headers.get("origin") || "https://paramitastudio.lovable.app";
+    
+    // Notification URL for DOKU to call when payment is completed
+    const notificationUrl = `${supabaseUrl}/functions/v1/doku-payment-notification`;
     
     // Build DOKU request body
     const dokuBody = {
@@ -94,7 +111,8 @@ serve(async (req) => {
         amount: Math.round(amount), // DOKU requires integer IDR amount
         invoice_number: invoiceNumber,
         currency: "IDR",
-        callback_url_result: callbackUrl || `${req.headers.get("origin")}/marketplace`,
+        callback_url: notificationUrl, // Server-to-server notification
+        callback_url_result: callbackUrl || `${origin}/payment-success?invoice=${invoiceNumber}`,
         language: "EN",
         auto_redirect: true,
       },
@@ -102,7 +120,7 @@ serve(async (req) => {
         payment_due_date: 60, // 60 minutes to complete payment
       },
       customer: {
-        id: userId || "guest",
+        id: userId,
         email: userEmail || "customer@example.com",
         name: userEmail?.split("@")[0] || "Customer",
       },
@@ -122,6 +140,7 @@ serve(async (req) => {
     
     console.log("Digest:", digest);
     console.log("Request-Target:", requestTarget);
+    console.log("Notification URL:", notificationUrl);
     console.log("Calling DOKU API with headers:", {
       "Client-Id": dokuClientId,
       "Request-Id": requestId,
@@ -129,7 +148,7 @@ serve(async (req) => {
     });
 
     // Call DOKU API
-    const response = await fetch(DOKU_SANDBOX_URL, {
+    const response = await fetch(DOKU_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -159,6 +178,29 @@ serve(async (req) => {
     if (!paymentUrl) {
       console.error("No payment URL in response:", dokuResponse);
       throw new Error("Failed to get payment URL from DOKU");
+    }
+
+    // Create pending purchase record in database
+    const { error: insertError } = await supabase
+      .from("purchases")
+      .insert({
+        user_id: userId,
+        game_id: gameId,
+        amount: amount,
+        payment_gateway: "doku",
+        gateway_order_id: invoiceNumber,
+        payment_status: "pending",
+        payment_details: {
+          doku_session_id: dokuResponse.response?.order?.session_id,
+          expired_date: dokuResponse.response?.payment?.expired_date,
+        },
+      });
+
+    if (insertError) {
+      console.error("Error creating pending purchase:", insertError);
+      // Don't fail the payment, just log the error
+    } else {
+      console.log("Pending purchase created for invoice:", invoiceNumber);
     }
 
     console.log("Payment URL generated:", paymentUrl);

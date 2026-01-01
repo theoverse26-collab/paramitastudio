@@ -2,3 +2,6 @@ project_id = "wbbqfihwrteyabzyqdfi"
 
 [functions.create-doku-payment]
 verify_jwt = true
+
+[functions.doku-payment-notification]
+verify_jwt = false
