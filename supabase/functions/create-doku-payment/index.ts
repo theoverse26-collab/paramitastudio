@@ -6,7 +6,7 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const DOKU_SANDBOX_URL = "https://api-sandbox.doku.com/checkout/v1/payment";
+const DOKU_PRODUCTION_URL = "https://api.doku.com/checkout/v1/payment";
 
 // Generate HMAC-SHA256 signature per DOKU spec
 async function generateSignature(
@@ -123,7 +123,7 @@ serve(async (req) => {
     });
 
     // Call DOKU API
-    const response = await fetch(DOKU_SANDBOX_URL, {
+    const response = await fetch(DOKU_PRODUCTION_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
