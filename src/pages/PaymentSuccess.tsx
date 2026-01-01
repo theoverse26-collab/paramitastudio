@@ -59,33 +59,66 @@ const PaymentSuccess = () => {
         } else if (purchase.payment_status === "failed") {
           setStatus("failed");
         } else {
-          // Still pending, poll for updates
+          // Still pending, poll for updates using edge function as fallback
           setStatus("pending");
           
-          // Poll every 3 seconds for up to 30 seconds
+          // Poll every 5 seconds for up to 60 seconds
           let attempts = 0;
-          const maxAttempts = 10;
+          const maxAttempts = 12;
           
           const pollInterval = setInterval(async () => {
             attempts++;
+            console.log(`Polling attempt ${attempts}/${maxAttempts}`);
             
-            const { data: updatedPurchase } = await supabase
-              .from("purchases")
-              .select("payment_status")
-              .eq("gateway_order_id", invoice)
-              .single();
+            try {
+              // Use edge function to check status (can access service role)
+              const { data: statusData, error: statusError } = await supabase.functions.invoke(
+                "check-doku-payment-status",
+                { body: { invoiceNumber: invoice } }
+              );
 
-            if (updatedPurchase?.payment_status === "completed") {
-              setStatus("completed");
-              clearInterval(pollInterval);
-            } else if (updatedPurchase?.payment_status === "failed" || attempts >= maxAttempts) {
-              if (updatedPurchase?.payment_status === "failed") {
-                setStatus("failed");
+              if (statusError) {
+                console.error("Error checking status via edge function:", statusError);
+                // Fallback to direct query
+                const { data: updatedPurchase } = await supabase
+                  .from("purchases")
+                  .select("payment_status")
+                  .eq("gateway_order_id", invoice)
+                  .single();
+
+                if (updatedPurchase?.payment_status === "completed") {
+                  setStatus("completed");
+                  setPurchaseInfo(prev => prev ? { ...prev, status: "completed" } : null);
+                  clearInterval(pollInterval);
+                } else if (updatedPurchase?.payment_status === "failed") {
+                  setStatus("failed");
+                  clearInterval(pollInterval);
+                }
+              } else if (statusData?.purchase) {
+                const purchaseStatus = statusData.purchase.status;
+                
+                if (purchaseStatus === "completed") {
+                  setStatus("completed");
+                  setPurchaseInfo({
+                    gameTitle: statusData.purchase.gameTitle,
+                    amount: statusData.purchase.amount,
+                    status: "completed",
+                  });
+                  clearInterval(pollInterval);
+                } else if (purchaseStatus === "failed") {
+                  setStatus("failed");
+                  clearInterval(pollInterval);
+                }
               }
-              // Keep as pending if max attempts reached but not failed
+            } catch (pollError) {
+              console.error("Poll error:", pollError);
+            }
+
+            if (attempts >= maxAttempts) {
+              console.log("Max polling attempts reached, keeping as pending");
               clearInterval(pollInterval);
             }
-          }, 3000);
+          }, 5000);
 
           return () => clearInterval(pollInterval);
         }

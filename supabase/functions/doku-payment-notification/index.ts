@@ -47,14 +47,26 @@ async function verifySignature(
 }
 
 serve(async (req) => {
+  const startTime = Date.now();
+  
   // Handle CORS preflight
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-  console.log("=== DOKU Payment Notification Received ===");
+  console.log("========================================");
+  console.log("=== DOKU Payment Notification START ===");
+  console.log("========================================");
+  console.log("Timestamp:", new Date().toISOString());
   console.log("Method:", req.method);
-  console.log("Headers:", JSON.stringify(Object.fromEntries(req.headers.entries())));
+  console.log("URL:", req.url);
+  
+  // Log all headers for debugging
+  const headers: Record<string, string> = {};
+  req.headers.forEach((value, key) => {
+    headers[key] = value;
+  });
+  console.log("All Headers:", JSON.stringify(headers, null, 2));
 
   try {
     const dokuClientId = Deno.env.get("DOKU_CLIENT_ID");

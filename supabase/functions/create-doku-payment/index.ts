@@ -180,27 +180,69 @@ serve(async (req) => {
       throw new Error("Failed to get payment URL from DOKU");
     }
 
-    // Create pending purchase record in database
-    const { error: insertError } = await supabase
+    // Check for existing purchase for this user/game combo
+    const { data: existingPurchase } = await supabase
       .from("purchases")
-      .insert({
-        user_id: userId,
-        game_id: gameId,
-        amount: amount,
-        payment_gateway: "doku",
-        gateway_order_id: invoiceNumber,
-        payment_status: "pending",
-        payment_details: {
-          doku_session_id: dokuResponse.response?.order?.session_id,
-          expired_date: dokuResponse.response?.payment?.expired_date,
-        },
-      });
+      .select("*")
+      .eq("user_id", userId)
+      .eq("game_id", gameId)
+      .single();
 
-    if (insertError) {
-      console.error("Error creating pending purchase:", insertError);
-      // Don't fail the payment, just log the error
+    if (existingPurchase) {
+      if (existingPurchase.payment_status === "completed") {
+        console.log("Game already purchased by user");
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: "You have already purchased this game",
+          }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+      
+      // Update existing pending purchase with new invoice
+      const { error: updateError } = await supabase
+        .from("purchases")
+        .update({
+          gateway_order_id: invoiceNumber,
+          payment_status: "pending",
+          payment_details: {
+            doku_session_id: dokuResponse.response?.order?.session_id,
+            expired_date: dokuResponse.response?.payment?.expired_date,
+          },
+        })
+        .eq("id", existingPurchase.id);
+
+      if (updateError) {
+        console.error("Error updating pending purchase:", updateError);
+      } else {
+        console.log("Updated existing pending purchase for invoice:", invoiceNumber);
+      }
     } else {
-      console.log("Pending purchase created for invoice:", invoiceNumber);
+      // Create new pending purchase record
+      const { error: insertError } = await supabase
+        .from("purchases")
+        .insert({
+          user_id: userId,
+          game_id: gameId,
+          amount: amount,
+          payment_gateway: "doku",
+          gateway_order_id: invoiceNumber,
+          payment_status: "pending",
+          payment_details: {
+            doku_session_id: dokuResponse.response?.order?.session_id,
+            expired_date: dokuResponse.response?.payment?.expired_date,
+          },
+        });
+
+      if (insertError) {
+        console.error("Error creating pending purchase:", insertError);
+      } else {
+        console.log("Pending purchase created for invoice:", invoiceNumber);
+      }
     }
 
     console.log("Payment URL generated:", paymentUrl);

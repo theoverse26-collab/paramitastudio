@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.doku-payment-notification]
 verify_jwt = false
+
+[functions.check-doku-payment-status]
+verify_jwt = false
