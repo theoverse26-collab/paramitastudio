@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, User, LogOut, Heart } from "lucide-react";
 import { NavLink } from "./NavLink";
 import { Button } from "./ui/button";
@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, signOut, isAdmin } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground border-b border-primary-foreground/20">
@@ -48,7 +49,7 @@ const Navbar = () => {
               </>
             ) : (
               <Button
-                onClick={() => window.location.href = '/auth'}
+                onClick={() => navigate('/auth')}
                 variant="outline"
                 size="sm"
                 className="border-accent text-foreground hover:bg-accent/10"
@@ -96,7 +97,7 @@ const Navbar = () => {
             ) : (
               <button
                 onClick={() => {
-                  window.location.href = '/auth';
+                  navigate('/auth');
                   setIsOpen(false);
                 }}
                 className="block w-full text-left px-4 py-2 text-accent hover:bg-accent/10 rounded"
