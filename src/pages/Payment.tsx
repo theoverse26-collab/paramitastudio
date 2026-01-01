@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,7 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
-import { Lock, ShieldCheck } from "lucide-react";
+import { Lock, ShieldCheck, Loader2 } from "lucide-react";
 
 interface Game {
   id: string;
@@ -18,17 +18,8 @@ interface Game {
   image_url: string;
 }
 
-declare global {
-  interface Window {
-    paypal?: {
-      HostedButtons: (config: { hostedButtonId: string }) => {
-        render: (selector: string) => Promise<void>;
-      };
-    };
-  }
-}
-
-const PAYPAL_HOSTED_BUTTON_ID = "56M44P459SACY";
+// Conversion rate USD to IDR (for display and payment)
+const USD_TO_IDR = 15000;
 
 const Payment = () => {
   const [searchParams] = useSearchParams();
@@ -37,10 +28,7 @@ const Payment = () => {
   const { user, loading: authLoading } = useAuth();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
-  const [paypalLoaded, setPaypalLoaded] = useState(false);
-  const [paypalError, setPaypalError] = useState<string | null>(null);
-  const paypalContainerRef = useRef<HTMLDivElement>(null);
-  const paypalScriptLoaded = useRef(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -59,12 +47,6 @@ const Payment = () => {
 
     fetchGame();
   }, [gameId, user, authLoading, navigate]);
-
-  useEffect(() => {
-    if (game && !paypalScriptLoaded.current) {
-      loadPayPalScript();
-    }
-  }, [game]);
 
   const fetchGame = async () => {
     try {
@@ -85,88 +67,63 @@ const Payment = () => {
     }
   };
 
-  const loadPayPalScript = () => {
-    if (paypalScriptLoaded.current) return;
-    paypalScriptLoaded.current = true;
-
-    // Already present?
-    const existing = document.querySelector<HTMLScriptElement>(
-      'script[data-paypal-hosted-buttons="true"]'
-    );
-    if (existing) {
-      setPaypalLoaded(true);
-      renderPayPalButton();
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.setAttribute("data-paypal-hosted-buttons", "true");
-    script.src =
-      "https://www.paypal.com/sdk/js?client-id=BAAn9BhNr-uImomksJySHcj67NkefF2WE4YDDKXqWNSf2AJ04V0Vy-uGsqwzBAJS7sBPtXhGvqqChT_Daw&components=hosted-buttons&disable-funding=venmo&currency=USD";
-    script.async = true;
-    script.onload = () => {
-      setPaypalLoaded(true);
-      renderPayPalButton();
-    };
-    script.onerror = () => {
-      console.error("Failed to load PayPal SDK");
-      setPaypalError("PayPal SDK failed to load");
-      toast.error("Failed to load payment system");
-    };
-    document.head.appendChild(script);
+  const formatIDR = (amount: number) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
 
-  const waitForHostedButtons = (retries = 25) => {
-    return new Promise<boolean>((resolve) => {
-      const check = (remaining: number) => {
-        const ok =
-          !!window.paypal && typeof window.paypal.HostedButtons === "function";
-
-        if (ok) return resolve(true);
-        if (remaining <= 0) return resolve(false);
-
-        setTimeout(() => check(remaining - 1), 150);
-      };
-
-      check(retries);
-    });
+  const getPriceInIDR = (usdPrice: number) => {
+    return Math.round(usdPrice * USD_TO_IDR);
   };
 
-  const renderPayPalButton = async () => {
-    if (!paypalContainerRef.current) return;
+  const handlePayment = async () => {
+    if (!game || !user) return;
 
-    // Clear any existing content
-    paypalContainerRef.current.innerHTML = "";
+    setProcessingPayment(true);
 
     try {
-      const ok =
-        !!window.paypal && typeof window.paypal.HostedButtons === "function";
+      const amountIDR = getPriceInIDR(game.price);
 
-      if (!ok) {
-        const ready = await waitForHostedButtons();
-        if (!ready) {
-          throw new Error(
-            "PayPal HostedButtons is not available (SDK may be blocked by browser/extensions)."
-          );
-        }
+      console.log("Creating DOKU payment...", {
+        gameId: game.id,
+        amount: amountIDR,
+      });
+
+      const { data, error } = await supabase.functions.invoke("create-doku-payment", {
+        body: {
+          gameId: game.id,
+          amount: amountIDR,
+          gameTitle: game.title,
+          userEmail: user.email,
+          userId: user.id,
+          callbackUrl: `${window.location.origin}/marketplace`,
+        },
+      });
+
+      if (error) {
+        console.error("Edge function error:", error);
+        throw new Error(error.message || "Failed to create payment");
       }
 
-      // At this point it should exist - await the render promise
-      await window.paypal!.HostedButtons({
-        hostedButtonId: PAYPAL_HOSTED_BUTTON_ID,
-      }).render(`#paypal-container-${PAYPAL_HOSTED_BUTTON_ID}`);
-    } catch (err) {
-      console.error("PayPal Hosted Button render error:", err);
-      setPaypalError("Unable to render PayPal button");
-      toast.error("Unable to load PayPal button");
+      if (!data?.success || !data?.paymentUrl) {
+        console.error("Payment creation failed:", data);
+        throw new Error(data?.error || "Failed to get payment URL");
+      }
+
+      console.log("Payment URL received:", data.paymentUrl);
+
+      // Redirect to DOKU checkout page
+      window.location.href = data.paymentUrl;
+    } catch (error: any) {
+      console.error("Payment error:", error);
+      toast.error(error.message || "Failed to process payment");
+      setProcessingPayment(false);
     }
   };
-
-  useEffect(() => {
-    if (paypalLoaded && game) {
-      renderPayPalButton();
-    }
-  }, [paypalLoaded, game]);
 
   if (loading || authLoading) {
     return (
@@ -200,6 +157,8 @@ const Payment = () => {
     );
   }
 
+  const priceIDR = getPriceInIDR(game.price);
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -227,17 +186,20 @@ const Payment = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Subtotal</span>
-                    <span>${game.price.toFixed(2)}</span>
+                    <span>{formatIDR(priceIDR)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Tax</span>
-                    <span>$0.00</span>
+                    <span>{formatIDR(0)}</span>
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between text-xl font-bold">
                     <span>Total</span>
-                    <span className="text-primary">${game.price.toFixed(2)}</span>
+                    <span className="text-primary">{formatIDR(priceIDR)}</span>
                   </div>
+                  <p className="text-xs text-muted-foreground text-right">
+                    ≈ ${game.price.toFixed(2)} USD
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -253,36 +215,41 @@ const Payment = () => {
                   Secure Checkout
                 </CardTitle>
                 <CardDescription>
-                  Complete your purchase securely with PayPal
+                  Complete your purchase securely with DOKU
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {paypalError ? (
-                  <div className="rounded-lg border border-border bg-muted/40 p-4">
-                    <p className="font-medium">Payment temporarily unavailable</p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {paypalError}. Please disable ad-blockers for PayPal or try another browser.
-                    </p>
-                  </div>
-                ) : (
-                  <div
-                    id={`paypal-container-${PAYPAL_HOSTED_BUTTON_ID}`}
-                    ref={paypalContainerRef}
-                  >
-                    {!paypalLoaded && (
-                      <div className="flex items-center justify-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div>
-                        <span className="text-muted-foreground">
-                          Loading payment options...
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <div className="rounded-lg border border-border bg-muted/20 p-4">
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Available payment methods:
+                  </p>
+                  <ul className="text-sm space-y-1 text-muted-foreground">
+                    <li>• Virtual Account (BCA, Mandiri, BNI, etc.)</li>
+                    <li>• Credit/Debit Card</li>
+                    <li>• QRIS</li>
+                    <li>• E-Wallet (OVO, GoPay, ShopeePay, etc.)</li>
+                  </ul>
+                </div>
+
+                <Button
+                  onClick={handlePayment}
+                  disabled={processingPayment}
+                  className="w-full h-12 text-lg"
+                  size="lg"
+                >
+                  {processingPayment ? (
+                    <>
+                      <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    `Pay ${formatIDR(priceIDR)}`
+                  )}
+                </Button>
 
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground pt-4 border-t">
                   <ShieldCheck className="w-4 h-4" />
-                  <span>Payments are processed securely by PayPal</span>
+                  <span>Payments are processed securely by DOKU</span>
                 </div>
 
                 <p className="text-xs text-center text-muted-foreground">
