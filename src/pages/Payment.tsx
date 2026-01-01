@@ -38,6 +38,7 @@ const Payment = () => {
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
+  const [paypalError, setPaypalError] = useState<string | null>(null);
   const paypalContainerRef = useRef<HTMLDivElement>(null);
   const paypalScriptLoaded = useRef(false);
 
@@ -88,8 +89,20 @@ const Payment = () => {
     if (paypalScriptLoaded.current) return;
     paypalScriptLoaded.current = true;
 
+    // Already present?
+    const existing = document.querySelector<HTMLScriptElement>(
+      'script[data-paypal-hosted-buttons="true"]'
+    );
+    if (existing) {
+      setPaypalLoaded(true);
+      renderPayPalButton();
+      return;
+    }
+
     const script = document.createElement("script");
-    script.src = "https://www.paypal.com/sdk/js?client-id=BAAn9BhNr-uImomksJySHcj67NkefF2WE4YDDKXqWNSf2AJ04V0Vy-uGsqwzBAJS7sBPtXhGvqqChT_Daw&components=hosted-buttons&disable-funding=venmo&currency=USD";
+    script.setAttribute("data-paypal-hosted-buttons", "true");
+    script.src =
+      "https://www.paypal.com/sdk/js?client-id=BAAn9BhNr-uImomksJySHcj67NkefF2WE4YDDKXqWNSf2AJ04V0Vy-uGsqwzBAJS7sBPtXhGvqqChT_Daw&components=hosted-buttons&disable-funding=venmo&currency=USD";
     script.async = true;
     script.onload = () => {
       setPaypalLoaded(true);
@@ -97,20 +110,56 @@ const Payment = () => {
     };
     script.onerror = () => {
       console.error("Failed to load PayPal SDK");
+      setPaypalError("PayPal SDK failed to load");
       toast.error("Failed to load payment system");
     };
-    document.body.appendChild(script);
+    document.head.appendChild(script);
   };
 
-  const renderPayPalButton = () => {
-    if (!window.paypal || !paypalContainerRef.current) return;
+  const waitForHostedButtons = (retries = 25) => {
+    return new Promise<boolean>((resolve) => {
+      const check = (remaining: number) => {
+        const ok =
+          !!window.paypal && typeof window.paypal.HostedButtons === "function";
+
+        if (ok) return resolve(true);
+        if (remaining <= 0) return resolve(false);
+
+        setTimeout(() => check(remaining - 1), 150);
+      };
+
+      check(retries);
+    });
+  };
+
+  const renderPayPalButton = async () => {
+    if (!paypalContainerRef.current) return;
 
     // Clear any existing content
     paypalContainerRef.current.innerHTML = "";
 
-    window.paypal.HostedButtons({
-      hostedButtonId: PAYPAL_HOSTED_BUTTON_ID,
-    }).render(`#paypal-container-${PAYPAL_HOSTED_BUTTON_ID}`);
+    try {
+      const ok =
+        !!window.paypal && typeof window.paypal.HostedButtons === "function";
+
+      if (!ok) {
+        const ready = await waitForHostedButtons();
+        if (!ready) {
+          throw new Error(
+            "PayPal HostedButtons is not available (SDK may be blocked by browser/extensions)."
+          );
+        }
+      }
+
+      // At this point it should exist
+      window.paypal!.HostedButtons({
+        hostedButtonId: PAYPAL_HOSTED_BUTTON_ID,
+      }).render(`#paypal-container-${PAYPAL_HOSTED_BUTTON_ID}`);
+    } catch (err) {
+      console.error("PayPal Hosted Button render error:", err);
+      setPaypalError("Unable to render PayPal button");
+      toast.error("Unable to load PayPal button");
+    }
   };
 
   useEffect(() => {
@@ -208,17 +257,28 @@ const Payment = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div 
-                  id={`paypal-container-${PAYPAL_HOSTED_BUTTON_ID}`}
-                  ref={paypalContainerRef}
-                >
-                  {!paypalLoaded && (
-                    <div className="flex items-center justify-center py-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div>
-                      <span className="text-muted-foreground">Loading payment options...</span>
-                    </div>
-                  )}
-                </div>
+                {paypalError ? (
+                  <div className="rounded-lg border border-border bg-muted/40 p-4">
+                    <p className="font-medium">Payment temporarily unavailable</p>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {paypalError}. Please disable ad-blockers for PayPal or try another browser.
+                    </p>
+                  </div>
+                ) : (
+                  <div
+                    id={`paypal-container-${PAYPAL_HOSTED_BUTTON_ID}`}
+                    ref={paypalContainerRef}
+                  >
+                    {!paypalLoaded && (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div>
+                        <span className="text-muted-foreground">
+                          Loading payment options...
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground pt-4 border-t">
                   <ShieldCheck className="w-4 h-4" />
