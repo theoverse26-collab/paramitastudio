@@ -63,6 +63,7 @@ const Dashboard = () => {
             file_url
           )
         `)
+        .eq('payment_status', 'completed')
         .order('purchase_date', { ascending: false });
 
       if (error) throw error;
