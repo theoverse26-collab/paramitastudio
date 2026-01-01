@@ -16,17 +16,18 @@ async function generateSignature(
   requestTarget: string,
   body: string,
   secretKey: string
-): Promise<string> {
+): Promise<{ signature: string; digest: string }> {
   const encoder = new TextEncoder();
   
-  // Calculate digest of request body
+  // Calculate digest of request body (just base64 SHA-256, no prefix)
   const bodyBytes = encoder.encode(body);
   const digestBuffer = await crypto.subtle.digest("SHA-256", bodyBytes);
   const digestB64 = btoa(String.fromCharCode(...new Uint8Array(digestBuffer)));
-  const digest = `SHA-256=${digestB64}`;
   
-  // Build signature component string
-  const componentSignature = `Client-Id:${clientId}\nRequest-Id:${requestId}\nRequest-Timestamp:${timestamp}\nRequest-Target:${requestTarget}\nDigest:${digest}`;
+  // Build signature component string per DOKU spec
+  const componentSignature = `Client-Id:${clientId}\nRequest-Id:${requestId}\nRequest-Timestamp:${timestamp}\nRequest-Target:${requestTarget}\nDigest:${digestB64}`;
+  
+  console.log("Component signature string:", componentSignature);
   
   // Generate HMAC-SHA256
   const key = await crypto.subtle.importKey(
@@ -45,7 +46,10 @@ async function generateSignature(
   
   const signatureB64 = btoa(String.fromCharCode(...new Uint8Array(signatureBuffer)));
   
-  return `HMACSHA256=${signatureB64}`;
+  return {
+    signature: `HMACSHA256=${signatureB64}`,
+    digest: digestB64
+  };
 }
 
 serve(async (req) => {
@@ -106,8 +110,8 @@ serve(async (req) => {
     
     const bodyString = JSON.stringify(dokuBody);
     
-    // Generate signature
-    const signature = await generateSignature(
+    // Generate signature and digest
+    const { signature, digest } = await generateSignature(
       dokuClientId,
       requestId,
       timestamp,
@@ -116,6 +120,8 @@ serve(async (req) => {
       dokuSecretKey
     );
     
+    console.log("Digest:", digest);
+    console.log("Request-Target:", requestTarget);
     console.log("Calling DOKU API with headers:", {
       "Client-Id": dokuClientId,
       "Request-Id": requestId,
@@ -131,6 +137,7 @@ serve(async (req) => {
         "Request-Id": requestId,
         "Request-Timestamp": timestamp,
         "Signature": signature,
+        "Digest": digest,
       },
       body: bodyString,
     });
