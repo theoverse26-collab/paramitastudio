@@ -126,21 +126,36 @@ export type Database = {
         Row: {
           amount: number
           game_id: string
+          gateway_order_id: string | null
+          gateway_transaction_id: string | null
           id: string
+          payment_details: Json | null
+          payment_gateway: string
+          payment_status: string
           purchase_date: string
           user_id: string
         }
         Insert: {
           amount: number
           game_id: string
+          gateway_order_id?: string | null
+          gateway_transaction_id?: string | null
           id?: string
+          payment_details?: Json | null
+          payment_gateway?: string
+          payment_status?: string
           purchase_date?: string
           user_id: string
         }
         Update: {
           amount?: number
           game_id?: string
+          gateway_order_id?: string | null
+          gateway_transaction_id?: string | null
           id?: string
+          payment_details?: Json | null
+          payment_gateway?: string
+          payment_status?: string
           purchase_date?: string
           user_id?: string
         }

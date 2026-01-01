@@ -1,16 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { toast } from "sonner";
-import { CreditCard, Lock } from "lucide-react";
+import { Lock, ShieldCheck } from "lucide-react";
 
 interface Game {
   id: string;
@@ -20,6 +17,29 @@ interface Game {
   image_url: string;
 }
 
+declare global {
+  interface Window {
+    paypal?: {
+      Buttons: (config: {
+        style?: {
+          layout?: string;
+          color?: string;
+          shape?: string;
+          label?: string;
+        };
+        createOrder: () => Promise<string>;
+        onApprove: (data: { orderID: string }) => Promise<void>;
+        onError: (err: Error) => void;
+        onCancel: () => void;
+      }) => {
+        render: (selector: string) => Promise<void>;
+      };
+    };
+  }
+}
+
+const PAYPAL_CLIENT_ID = "AZwV5QLC8OLOfyvBt4R2hglbQ1fwEsGg60aMQGFCaX7f2EFsc04q5OQnTcUOGBvlxkMYpk-6PMafsgxv";
+
 const Payment = () => {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get("gameId");
@@ -27,7 +47,10 @@ const Payment = () => {
   const { user } = useAuth();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
+  const [paypalLoaded, setPaypalLoaded] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const paypalButtonsRef = useRef<HTMLDivElement>(null);
+  const paypalScriptLoaded = useRef(false);
 
   useEffect(() => {
     if (!user) {
@@ -44,6 +67,12 @@ const Payment = () => {
 
     fetchGame();
   }, [gameId, user, navigate]);
+
+  useEffect(() => {
+    if (game && !paypalScriptLoaded.current) {
+      loadPayPalScript();
+    }
+  }, [game]);
 
   const fetchGame = async () => {
     try {
@@ -64,46 +93,111 @@ const Payment = () => {
     }
   };
 
-  const handlePayment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setProcessing(true);
+  const loadPayPalScript = () => {
+    if (paypalScriptLoaded.current) return;
+    paypalScriptLoaded.current = true;
 
-    try {
-      // Check if already purchased
-      const { data: existingPurchase } = await supabase
-        .from("purchases")
-        .select("id")
-        .eq("user_id", user!.id)
-        .eq("game_id", gameId!)
-        .single();
-
-      if (existingPurchase) {
-        toast.error("You already own this game!");
-        navigate("/dashboard");
-        return;
-      }
-
-      // Simulate payment processing
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Create purchase record
-      const { error } = await supabase.from("purchases").insert({
-        user_id: user!.id,
-        game_id: gameId!,
-        amount: game!.price,
-      });
-
-      if (error) throw error;
-
-      toast.success("Purchase successful! Redirecting to your library...");
-      setTimeout(() => navigate("/dashboard"), 1500);
-    } catch (error: any) {
-      console.error("Purchase error:", error);
-      toast.error(error.message || "Failed to complete purchase");
-    } finally {
-      setProcessing(false);
-    }
+    const script = document.createElement("script");
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
+    script.async = true;
+    script.onload = () => {
+      setPaypalLoaded(true);
+      renderPayPalButtons();
+    };
+    script.onerror = () => {
+      console.error("Failed to load PayPal SDK");
+      toast.error("Failed to load payment system");
+    };
+    document.body.appendChild(script);
   };
+
+  const renderPayPalButtons = () => {
+    if (!window.paypal || !paypalButtonsRef.current || !game || !user) return;
+
+    // Clear any existing buttons
+    paypalButtonsRef.current.innerHTML = "";
+
+    window.paypal.Buttons({
+      style: {
+        layout: "vertical",
+        color: "gold",
+        shape: "rect",
+        label: "paypal",
+      },
+      createOrder: async () => {
+        setProcessing(true);
+        try {
+          const response = await supabase.functions.invoke("create-paypal-order", {
+            body: {
+              gameId: game.id,
+              gameTitle: game.title,
+              amount: game.price,
+              userId: user.id,
+            },
+          });
+
+          if (response.error) {
+            throw new Error(response.error.message || "Failed to create order");
+          }
+
+          const { orderId } = response.data;
+          if (!orderId) {
+            throw new Error("No order ID received");
+          }
+
+          return orderId;
+        } catch (error: any) {
+          console.error("Create order error:", error);
+          toast.error(error.message || "Failed to create PayPal order");
+          setProcessing(false);
+          throw error;
+        }
+      },
+      onApprove: async (data) => {
+        try {
+          const response = await supabase.functions.invoke("capture-paypal-order", {
+            body: {
+              orderId: data.orderID,
+              userId: user.id,
+              gameId: game.id,
+              amount: game.price,
+            },
+          });
+
+          if (response.error) {
+            throw new Error(response.error.message || "Failed to capture payment");
+          }
+
+          if (response.data.error) {
+            throw new Error(response.data.error);
+          }
+
+          toast.success("Payment successful! Redirecting to your library...");
+          setTimeout(() => navigate("/dashboard"), 1500);
+        } catch (error: any) {
+          console.error("Capture error:", error);
+          toast.error(error.message || "Failed to complete payment");
+        } finally {
+          setProcessing(false);
+        }
+      },
+      onError: (err) => {
+        console.error("PayPal error:", err);
+        toast.error("Payment failed. Please try again.");
+        setProcessing(false);
+      },
+      onCancel: () => {
+        toast.info("Payment cancelled");
+        setProcessing(false);
+      },
+    }).render("#paypal-button-container");
+  };
+
+  useEffect(() => {
+    if (paypalLoaded && game && user) {
+      renderPayPalButtons();
+    }
+  }, [paypalLoaded, game, user]);
 
   if (loading) {
     return (
@@ -165,9 +259,9 @@ const Payment = () => {
             </Card>
           </div>
 
-          {/* Payment Form */}
+          {/* Payment Section */}
           <div>
-            <h1 className="text-3xl font-bold mb-6">Payment Details</h1>
+            <h1 className="text-3xl font-bold mb-6">Payment</h1>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -175,78 +269,40 @@ const Payment = () => {
                   Secure Checkout
                 </CardTitle>
                 <CardDescription>
-                  This is a placeholder payment form. No real transactions will be processed.
+                  Complete your purchase securely with PayPal
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <form onSubmit={handlePayment} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="cardNumber">Card Number</Label>
-                    <div className="relative">
-                      <Input
-                        id="cardNumber"
-                        placeholder="1234 5678 9012 3456"
-                        defaultValue="4242 4242 4242 4242"
-                        required
-                      />
-                      <CreditCard className="absolute right-3 top-3 w-5 h-5 text-muted-foreground" />
-                    </div>
+              <CardContent className="space-y-6">
+                {processing && (
+                  <div className="flex items-center justify-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div>
+                    <span className="text-muted-foreground">Processing payment...</span>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="expiry">Expiry Date</Label>
-                      <Input
-                        id="expiry"
-                        placeholder="MM/YY"
-                        defaultValue="12/25"
-                        required
-                      />
+                )}
+                
+                <div 
+                  id="paypal-button-container" 
+                  ref={paypalButtonsRef}
+                  className={processing ? "opacity-50 pointer-events-none" : ""}
+                >
+                  {!paypalLoaded && (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mr-3"></div>
+                      <span className="text-muted-foreground">Loading payment options...</span>
                     </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="cvc">CVC</Label>
-                      <Input
-                        id="cvc"
-                        placeholder="123"
-                        defaultValue="123"
-                        required
-                      />
-                    </div>
-                  </div>
+                  )}
+                </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Cardholder Name</Label>
-                    <Input
-                      id="name"
-                      placeholder="John Doe"
-                      defaultValue="John Doe"
-                      required
-                    />
-                  </div>
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground pt-4 border-t">
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>Payments are processed securely by PayPal</span>
+                </div>
 
-                  <Separator className="my-4" />
-
-                  <Button
-                    type="submit"
-                    className="w-full"
-                    size="lg"
-                    disabled={processing}
-                  >
-                    {processing ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-background mr-2"></div>
-                        Processing...
-                      </>
-                    ) : (
-                      `Pay $${game.price.toFixed(2)}`
-                    )}
-                  </Button>
-
-                  <p className="text-xs text-center text-muted-foreground mt-4">
-                    By completing this purchase, you agree to our terms of service.
-                    This is a demonstration payment form.
-                  </p>
-                </form>
+                <p className="text-xs text-center text-muted-foreground">
+                  By completing this purchase, you agree to our terms of service.
+                  <br />
+                  <span className="text-yellow-600 font-medium">Sandbox Mode: Use PayPal test credentials</span>
+                </p>
               </CardContent>
             </Card>
           </div>
