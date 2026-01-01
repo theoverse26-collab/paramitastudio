@@ -151,8 +151,8 @@ const Payment = () => {
         }
       }
 
-      // At this point it should exist
-      window.paypal!.HostedButtons({
+      // At this point it should exist - await the render promise
+      await window.paypal!.HostedButtons({
         hostedButtonId: PAYPAL_HOSTED_BUTTON_ID,
       }).render(`#paypal-container-${PAYPAL_HOSTED_BUTTON_ID}`);
     } catch (err) {

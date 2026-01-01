@@ -24,12 +24,14 @@ interface WishlistItem {
 }
 
 const Wishlist = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (authLoading) return;
+    
     if (!user) {
       toast.error("Please log in to view your wishlist");
       navigate("/auth");
@@ -37,7 +39,7 @@ const Wishlist = () => {
     }
 
     fetchWishlist();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const fetchWishlist = async () => {
     try {
@@ -90,7 +92,7 @@ const Wishlist = () => {
     navigate(`/payment?gameId=${gameId}`);
   };
 
-  if (loading) {
+  if (loading || authLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
