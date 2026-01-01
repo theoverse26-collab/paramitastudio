@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -44,7 +45,7 @@ const Payment = () => {
   const [searchParams] = useSearchParams();
   const gameId = searchParams.get("gameId");
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
@@ -53,6 +54,9 @@ const Payment = () => {
   const paypalScriptLoaded = useRef(false);
 
   useEffect(() => {
+    // Wait for auth to finish loading before checking user
+    if (authLoading) return;
+    
     if (!user) {
       toast.error("Please log in to make a purchase");
       navigate("/auth");
@@ -66,7 +70,7 @@ const Payment = () => {
     }
 
     fetchGame();
-  }, [gameId, user, navigate]);
+  }, [gameId, user, authLoading, navigate]);
 
   useEffect(() => {
     if (game && !paypalScriptLoaded.current) {
@@ -214,7 +218,22 @@ const Payment = () => {
     );
   }
 
-  if (!game) return null;
+  if (!game) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="flex items-center justify-center h-[50vh]">
+          <div className="text-center">
+            <p className="text-muted-foreground">Game not found</p>
+            <Button onClick={() => navigate("/marketplace")} className="mt-4">
+              Browse Games
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
