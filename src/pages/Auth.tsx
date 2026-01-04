@@ -16,13 +16,15 @@ const authSchema = z.object({
   fullName: z.string().max(100, 'Name too long').optional(),
 });
 
+type AuthMode = 'login' | 'signup' | 'forgot';
+
 const Auth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+  const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
-  const { signUp, signIn } = useAuth();
+  const { signUp, signIn, resetPassword } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -31,7 +33,37 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      // Validate inputs
+      if (mode === 'forgot') {
+        const emailValidation = z.string().email('Invalid email address').safeParse(email);
+        if (!emailValidation.success) {
+          toast({
+            title: 'Validation Error',
+            description: emailValidation.error.errors[0].message,
+            variant: 'destructive',
+          });
+          setLoading(false);
+          return;
+        }
+
+        const { error } = await resetPassword(email);
+        if (error) {
+          toast({
+            title: 'Reset Failed',
+            description: error.message,
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Check Your Email',
+            description: 'We sent you a password reset link.',
+          });
+          setMode('login');
+        }
+        setLoading(false);
+        return;
+      }
+
+      // Validate inputs for login/signup
       const validation = authSchema.safeParse({ email, password, fullName });
       if (!validation.success) {
         toast({
@@ -43,7 +75,7 @@ const Auth = () => {
         return;
       }
 
-      if (isLogin) {
+      if (mode === 'login') {
         const { error } = await signIn(email, password);
         if (error) {
           toast({
@@ -104,14 +136,18 @@ const Auth = () => {
         >
           <div className="bg-card border border-border rounded-xl p-8 shadow-elegant">
             <h1 className="text-3xl font-bold text-center mb-2 text-gradient-gold uppercase">
-              {isLogin ? 'Login' : 'Sign Up'}
+              {mode === 'login' ? 'Login' : mode === 'signup' ? 'Sign Up' : 'Reset Password'}
             </h1>
             <p className="text-center text-muted-foreground mb-6">
-              {isLogin ? 'Welcome back to Paramita Studio' : 'Join the Paramita Studio community'}
+              {mode === 'login' 
+                ? 'Welcome back to Paramita Studio' 
+                : mode === 'signup' 
+                ? 'Join the Paramita Studio community'
+                : 'Enter your email to receive a reset link'}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {!isLogin && (
+              {mode === 'signup' && (
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name</Label>
                   <Input
@@ -136,34 +172,62 @@ const Auth = () => {
                 />
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
+              {mode !== 'forgot' && (
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
+                    required
+                  />
+                </div>
+              )}
 
               <Button
                 type="submit"
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                 disabled={loading}
               >
-                {loading ? 'Please wait...' : isLogin ? 'Login' : 'Sign Up'}
+                {loading 
+                  ? 'Please wait...' 
+                  : mode === 'login' 
+                  ? 'Login' 
+                  : mode === 'signup' 
+                  ? 'Sign Up' 
+                  : 'Send Reset Link'}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <button
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-accent hover:text-accent/80 text-sm"
-              >
-                {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login'}
-              </button>
+            {mode === 'login' && (
+              <div className="mt-4 text-center">
+                <button
+                  onClick={() => setMode('forgot')}
+                  className="text-muted-foreground hover:text-accent text-sm"
+                >
+                  Forgot your password?
+                </button>
+              </div>
+            )}
+
+            <div className="mt-4 text-center">
+              {mode === 'forgot' ? (
+                <button
+                  onClick={() => setMode('login')}
+                  className="text-accent hover:text-accent/80 text-sm"
+                >
+                  Back to Login
+                </button>
+              ) : (
+                <button
+                  onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                  className="text-accent hover:text-accent/80 text-sm"
+                >
+                  {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Login'}
+                </button>
+              )}
             </div>
           </div>
         </motion.div>
