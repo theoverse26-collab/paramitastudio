@@ -60,14 +60,9 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <motion.img
-              src={logoParamita}
-              alt="Paramita Studio"
-              className="h-48 md:h-64 lg:h-80 w-auto mx-auto mb-6"
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.8 }}
-            />
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-primary-foreground mb-6 uppercase tracking-wider">
+              PARAMITA STUDIO
+            </h1>
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -170,6 +165,25 @@ const Index = () => {
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Logo Section */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="flex justify-center"
+          >
+            <img 
+              src={logoParamita} 
+              alt="Paramita Studio" 
+              className="h-64 md:h-80 lg:h-96 w-auto"
+            />
+          </motion.div>
         </div>
       </section>
 
