@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.check-doku-payment-status]
 verify_jwt = false
+
+[functions.translate-game-content]
+verify_jwt = false
