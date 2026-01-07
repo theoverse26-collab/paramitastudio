@@ -40,11 +40,11 @@ const Footer = () => {
           </div>
 
           {/* Logo */}
-          <div className="flex items-center justify-center md:justify-end">
+          <div className="flex items-center justify-center">
             <img 
               src={logoParamita} 
               alt="Paramita Studio Logo" 
-              className="h-24 w-auto object-contain"
+              className="h-32 w-auto object-contain"
             />
           </div>
         </div>
