@@ -149,13 +149,11 @@ const Wishlist = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
 
-                <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-bold text-lg line-clamp-1">{item.games.title}</h3>
-                    <span className="text-sm text-muted-foreground bg-secondary px-2 py-1 rounded">
-                      {item.games.genre}
-                    </span>
-                  </div>
+                <div className="p-5">
+                  <span className="inline-block text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-muted px-2 py-1 rounded mb-3">
+                    {item.games.genre}
+                  </span>
+                  <h3 className="font-bold text-lg line-clamp-1 mb-2">{item.games.title}</h3>
 
                   <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
                     {item.games.description}

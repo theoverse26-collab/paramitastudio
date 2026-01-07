@@ -51,6 +51,7 @@ const UserMenu = () => {
       const { count, error } = await supabase
         .from('notifications')
         .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
         .eq('is_read', false);
 
       if (error) throw error;
@@ -70,7 +71,7 @@ const UserMenu = () => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary-foreground/20 bg-primary/10 hover:bg-accent/20 hover:border-accent/50 hover:shadow-[0_0_10px_hsl(var(--accent)/0.3)] text-primary-foreground transition-all duration-200"
+          className="relative flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary-foreground/20 bg-primary/10 hover:bg-accent/20 hover:border-accent/50 hover:shadow-[0_0_10px_hsl(var(--accent)/0.3)] text-primary-foreground hover:text-primary-foreground transition-all duration-200"
         >
           <User size={16} />
           <span className="hidden lg:inline max-w-[100px] truncate">{displayName}</span>
