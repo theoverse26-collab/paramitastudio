@@ -76,7 +76,7 @@ const Index = () => {
               transition={{ delay: 0.5 }}
               className="text-lg md:text-xl text-primary-foreground/90 mb-12 max-w-2xl mx-auto"
             >
-              Crafting immersive fantasy worlds that blend epic storytelling with innovative gameplay
+              {t('home.heroSubtitle')}
             </motion.p>
 
             <motion.div

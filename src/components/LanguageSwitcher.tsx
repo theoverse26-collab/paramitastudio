@@ -8,8 +8,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 
 const languages = [
-  { code: 'en', name: 'English', flag: '🇺🇸' },
-  { code: 'id', name: 'Indonesia', flag: '🇮🇩' },
+  { code: 'en', name: 'EN', flag: '🇺🇸' },
+  { code: 'id', name: 'ID', flag: '🇮🇩' },
 ];
 
 const LanguageSwitcher = () => {
@@ -25,16 +25,16 @@ const LanguageSwitcher = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button 
-          className="flex items-center gap-1.5 px-3 py-2 text-sm text-primary-foreground hover:text-accent transition-colors focus:outline-none"
+          className="flex items-center gap-1 px-2 py-1.5 text-sm text-primary-foreground hover:text-accent transition-colors focus:outline-none min-w-[60px] justify-center"
         >
-          <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{currentLanguage.flag}</span>
-          <ChevronDown className="h-3 w-3 opacity-70" />
+          <Globe className="h-4 w-4 flex-shrink-0" />
+          <span className="w-5 text-center">{currentLanguage.name}</span>
+          <ChevronDown className="h-3 w-3 opacity-70 flex-shrink-0" />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent 
         align="end" 
-        className="bg-card border-border shadow-lg min-w-[140px]"
+        className="bg-card border-border shadow-lg min-w-[120px]"
         sideOffset={8}
       >
         {languages.map((lang) => (
@@ -46,7 +46,7 @@ const LanguageSwitcher = () => {
             }`}
           >
             <span className="mr-2">{lang.flag}</span>
-            {lang.name}
+            {lang.code === 'en' ? 'English' : 'Indonesia'}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
