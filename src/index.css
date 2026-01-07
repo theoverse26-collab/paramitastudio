@@ -224,6 +224,21 @@ All colors MUST be HSL.
 .ProseMirror strong { font-weight: bold; }
 .ProseMirror em { font-style: italic; }
 
+/* YouTube embed styles for editor */
+.ProseMirror div[data-youtube-video] {
+  position: relative;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.ProseMirror div[data-youtube-video] iframe {
+  max-width: 100%;
+  width: 100%;
+  aspect-ratio: 16/9;
+  height: auto;
+  border-radius: 0.5rem;
+}
+
 /* News Content Display Styles (for published articles) */
 .news-content h1,
 .news-content h2,
@@ -284,4 +299,15 @@ All colors MUST be HSL.
   margin: 1em 0;
   font-style: italic;
   color: hsl(var(--muted-foreground));
+}
+
+/* YouTube embed styles for published articles */
+.news-content iframe[src*="youtube"],
+.news-content iframe[src*="youtube-nocookie"] {
+  max-width: 100%;
+  width: 100%;
+  aspect-ratio: 16/9;
+  height: auto;
+  border-radius: 0.5rem;
+  margin: 1.5em 0;
 }

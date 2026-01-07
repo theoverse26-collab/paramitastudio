@@ -48,9 +48,12 @@ const NewsDetailContent = ({ news }: { news: NewsPost }) => {
     content: news.content,
   });
 
-  // Use translated content (sanitize if HTML)
+  // Use translated content (sanitize if HTML, allow iframes for YouTube)
   const sanitizedContent = isHtml 
-    ? DOMPurify.sanitize(translated.content || news.content) 
+    ? DOMPurify.sanitize(translated.content || news.content, {
+        ADD_TAGS: ['iframe'],
+        ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'src', 'width', 'height']
+      }) 
     : null;
 
   return (

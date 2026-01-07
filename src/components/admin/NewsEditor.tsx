@@ -2,6 +2,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Placeholder from '@tiptap/extension-placeholder';
+import Youtube from '@tiptap/extension-youtube';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { 
@@ -12,6 +13,7 @@ import {
   List, 
   ListOrdered, 
   ImagePlus,
+  Youtube as YoutubeIcon,
   Save,
   X
 } from 'lucide-react';
@@ -64,6 +66,8 @@ const NewsEditor = ({
   const [category, setCategory] = useState(initialCategory);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [youtubeDialogOpen, setYoutubeDialogOpen] = useState(false);
+  const [youtubeUrl, setYoutubeUrl] = useState('');
 
   const editor = useEditor({
     extensions: [
@@ -71,6 +75,13 @@ const NewsEditor = ({
       Image.configure({
         HTMLAttributes: {
           class: 'rounded-lg max-w-full mx-auto my-6',
+        },
+      }),
+      Youtube.configure({
+        width: 640,
+        height: 360,
+        HTMLAttributes: {
+          class: 'youtube-embed',
         },
       }),
       Placeholder.configure({
@@ -102,6 +113,16 @@ const NewsEditor = ({
       editor.chain().focus().setImage({ src: newImageUrl }).run();
       setNewImageUrl('');
       setImageDialogOpen(false);
+    }
+  };
+
+  const insertYoutubeVideo = () => {
+    if (youtubeUrl && editor) {
+      editor.commands.setYoutubeVideo({
+        src: youtubeUrl,
+      });
+      setYoutubeUrl('');
+      setYoutubeDialogOpen(false);
     }
   };
 
@@ -232,6 +253,13 @@ const NewsEditor = ({
           >
             <ImagePlus className="h-4 w-4" />
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setYoutubeDialogOpen(true)}
+          >
+            <YoutubeIcon className="h-4 w-4" />
+          </Button>
         </div>
 
         {/* Editor Content */}
@@ -268,6 +296,28 @@ const NewsEditor = ({
               Cancel
             </Button>
             <Button onClick={insertImage} disabled={!newImageUrl}>
+              Insert
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* YouTube Insert Dialog */}
+      <Dialog open={youtubeDialogOpen} onOpenChange={setYoutubeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Insert YouTube Video</DialogTitle>
+          </DialogHeader>
+          <Input
+            value={youtubeUrl}
+            onChange={(e) => setYoutubeUrl(e.target.value)}
+            placeholder="Enter YouTube URL (e.g., https://www.youtube.com/watch?v=...)"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setYoutubeDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={insertYoutubeVideo} disabled={!youtubeUrl}>
               Insert
             </Button>
           </DialogFooter>
