@@ -24,6 +24,7 @@
   },
   "home": {
     "tagline": "Where Creativity Meets Simplicity",
+    "heroSubtitle": "Crafting immersive fantasy worlds that blend epic storytelling with innovative gameplay",
     "exploreGames": "Explore Our Games",
     "visitMarketplace": "Visit Marketplace",
     "aboutUs": "About Us",
@@ -65,13 +66,14 @@
   "contact": {
     "title": "Get In Touch",
     "subtitle": "Have questions or want to connect? We'd love to hear from you.",
+    "sendUsMessage": "Send Us a Message",
     "yourName": "Your Name",
     "yourEmail": "Your Email",
     "subject": "Subject",
     "message": "Message",
     "sendMessage": "Send Message",
-    "contactInfo": "Contact Info",
-    "emailUs": "Email Us",
+    "contactInfo": "Contact Information",
+    "emailUs": "Email",
     "location": "Location"
   },
   "games": {

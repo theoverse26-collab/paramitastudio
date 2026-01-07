@@ -24,6 +24,7 @@
   },
   "home": {
     "tagline": "Dimana Kreativitas Bertemu Kesederhanaan",
+    "heroSubtitle": "Menciptakan dunia fantasi yang imersif yang memadukan cerita epik dengan gameplay inovatif",
     "exploreGames": "Jelajahi Game Kami",
     "visitMarketplace": "Kunjungi Marketplace",
     "aboutUs": "Tentang Kami",
@@ -65,13 +66,14 @@
   "contact": {
     "title": "Hubungi Kami",
     "subtitle": "Punya pertanyaan atau ingin terhubung? Kami senang mendengar dari Anda.",
+    "sendUsMessage": "Kirim Pesan kepada Kami",
     "yourName": "Nama Anda",
     "yourEmail": "Email Anda",
     "subject": "Subjek",
     "message": "Pesan",
     "sendMessage": "Kirim Pesan",
-    "contactInfo": "Info Kontak",
-    "emailUs": "Email Kami",
+    "contactInfo": "Informasi Kontak",
+    "emailUs": "Email",
     "location": "Lokasi"
   },
   "games": {
