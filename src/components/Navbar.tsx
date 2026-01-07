@@ -6,6 +6,7 @@ import { NavLink } from "./NavLink";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import LanguageSwitcher from "./LanguageSwitcher";
+import InboxBell from "./InboxBell";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,6 +39,7 @@ const Navbar = () => {
                   <Heart size={18} className="inline mr-1" />
                   {t('nav.wishlist')}
                 </NavLink>
+                <InboxBell />
                 <NavLink to={isAdmin ? "/admin" : "/dashboard"}>
                   <User size={18} className="inline mr-1" />
                   {isAdmin ? t('nav.admin') : t('nav.dashboard')}
@@ -88,6 +90,7 @@ const Navbar = () => {
             {user ? (
               <>
                 <Link to="/wishlist" className="block px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>{t('nav.wishlist')}</Link>
+                <Link to="/inbox" className="block px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>{t('nav.inbox')}</Link>
                 <Link to={isAdmin ? "/admin" : "/dashboard"} className="block px-4 py-2 text-foreground hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>
                   {isAdmin ? t('nav.admin') : t('nav.dashboard')}
                 </Link>

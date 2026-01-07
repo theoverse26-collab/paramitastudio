@@ -19,6 +19,7 @@ import Admin from "./pages/Admin";
 import Payment from "./pages/Payment";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import Wishlist from "./pages/Wishlist";
+import Inbox from "./pages/Inbox";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/payment" element={<Payment />} />
               <Route path="/payment-success" element={<PaymentSuccess />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/inbox" element={<Inbox />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
