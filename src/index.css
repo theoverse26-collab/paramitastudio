@@ -171,3 +171,49 @@ All colors MUST be HSL.
     clip-path: polygon(0 0, 100% 0, 100% 95%, 95% 100%, 0 100%);
   }
 }
+
+/* TipTap Editor Styles */
+.ProseMirror {
+  @apply focus:outline-none;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  @apply text-muted-foreground/50 float-left h-0 pointer-events-none;
+  content: attr(data-placeholder);
+}
+
+.ProseMirror h1 {
+  @apply text-3xl font-bold mb-4 mt-6;
+}
+
+.ProseMirror h2 {
+  @apply text-2xl font-bold mb-3 mt-5;
+}
+
+.ProseMirror p {
+  @apply mb-4 leading-relaxed;
+}
+
+.ProseMirror ul {
+  @apply list-disc pl-6 mb-4;
+}
+
+.ProseMirror ol {
+  @apply list-decimal pl-6 mb-4;
+}
+
+.ProseMirror li {
+  @apply mb-1;
+}
+
+.ProseMirror img {
+  @apply rounded-lg max-w-full mx-auto my-6;
+}
+
+.ProseMirror strong {
+  @apply font-bold;
+}
+
+.ProseMirror em {
+  @apply italic;
+}
