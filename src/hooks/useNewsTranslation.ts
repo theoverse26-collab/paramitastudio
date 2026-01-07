@@ -50,9 +50,9 @@ export const useNewsTranslation = ({ newsId, title, content }: UseNewsTranslatio
         const hasTitle = !!cachedTitle?.trim();
         const hasContent = !!cachedContent?.trim();
 
-        // Check if source matches (cache is valid)
-        const titleMatches = sourceTitle === title;
-        const contentMatches = sourceContent === content;
+        // Check if source matches (cache is valid) - NULL source means cache is stale
+        const titleMatches = sourceTitle != null && sourceTitle === title;
+        const contentMatches = sourceContent != null && sourceContent === content;
         const cacheValid = titleMatches && contentMatches;
 
         // If cache is valid and has what we need, use it
