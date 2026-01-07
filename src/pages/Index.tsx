@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-bg.jpg";
+import logoParamita from "@/assets/logo-paramita.png";
 import { Sparkles, Gamepad2, Users } from "lucide-react";
 
 const Index = () => {
@@ -59,9 +60,14 @@ const Index = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-primary-foreground mb-6 uppercase tracking-wider">
-              PARAMITA STUDIO
-            </h1>
+            <motion.img
+              src={logoParamita}
+              alt="Paramita Studio"
+              className="h-48 md:h-64 lg:h-80 w-auto mx-auto mb-6"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.8 }}
+            />
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
