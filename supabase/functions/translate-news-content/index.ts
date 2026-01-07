@@ -100,6 +100,8 @@ serve(async (req) => {
       `The source text may be in any language - detect it and translate to ${targetLangName}.`,
       `Return ONLY a JSON object with exactly two keys: "title" and "content".`,
       `Rules:`,
+      `- DO NOT translate game names, product names, proper nouns, or brand names. Keep them in their original form.`,
+      `- Examples of names to keep unchanged: "Nightfall Odyssey", "Shadow Warrior", "Paramita Games", "Steam", "PlayStation", etc.`,
       `- If a field is missing/empty, return an empty string for that field.`,
       `- The content field may contain HTML tags. Preserve ALL HTML tags exactly as they are (like <p>, <img>, <h1>, <h2>, <ul>, <li>, <strong>, <em>, etc).`,
       `- Only translate the text content between HTML tags, not the tags themselves or their attributes.`,
