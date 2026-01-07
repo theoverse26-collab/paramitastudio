@@ -83,12 +83,12 @@ const NewsDetailContent = ({ news }: { news: NewsPost }) => {
 
       {isHtml ? (
         <div 
-          className="prose prose-lg max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground"
+          className={`news-content text-lg ${isTranslating ? 'opacity-70' : ''}`}
           dangerouslySetInnerHTML={{ __html: sanitizedContent! }}
         />
       ) : (
-        <div className="prose prose-lg max-w-none">
-          <p className={`text-lg text-foreground leading-relaxed whitespace-pre-wrap ${isTranslating ? 'opacity-70' : ''}`}>
+        <div className="news-content">
+          <p className={`text-lg leading-relaxed whitespace-pre-wrap ${isTranslating ? 'opacity-70' : ''}`}>
             {translated.content || news.content}
           </p>
         </div>
