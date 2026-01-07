@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      game_translations: {
+        Row: {
+          created_at: string
+          description: string | null
+          game_id: string
+          id: string
+          language: string
+          long_description: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          game_id: string
+          id?: string
+          language: string
+          long_description?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          game_id?: string
+          id?: string
+          language?: string
+          long_description?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_translations_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       games: {
         Row: {
           created_at: string

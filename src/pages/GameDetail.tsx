@@ -9,6 +9,7 @@ import { ArrowLeft, ShoppingCart, Heart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
 
 interface Game {
   id: string;
@@ -35,6 +36,12 @@ const GameDetail = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  const { translated, isTranslating } = useGameTranslation({
+    gameId: game?.id || '',
+    description: game?.description || '',
+    longDescription: game?.long_description || '',
+  });
 
   useEffect(() => {
     if (id) {
@@ -197,8 +204,8 @@ const GameDetail = () => {
                 transition={{ delay: 0.2 }}
               >
                 <h2 className="text-3xl font-bold mb-4">{t('gameDetail.aboutGame')}</h2>
-                <p className="text-muted-foreground text-lg leading-relaxed mb-8 whitespace-pre-line">
-                  {game.long_description}
+                <p className={`text-muted-foreground text-lg leading-relaxed mb-8 whitespace-pre-line ${isTranslating ? 'opacity-50' : ''}`}>
+                  {translated.long_description}
                 </p>
 
                 {game.features && game.features.length > 0 && (

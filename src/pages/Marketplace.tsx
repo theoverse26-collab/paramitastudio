@@ -3,12 +3,11 @@ import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { ShoppingCart, Heart } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import MarketplaceGameCard from "@/components/MarketplaceGameCard";
 
 interface Game {
   id: string;
@@ -166,65 +165,19 @@ const Marketplace = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {games.map((game, index) => (
-              <motion.div
+              <MarketplaceGameCard
                 key={game.id}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-card rounded-xl overflow-hidden border border-border hover-lift"
-              >
-                <div className="grid grid-cols-1 md:grid-cols-2">
-                  <div className="aspect-square">
-                    <img
-                      src={game.image_url}
-                      alt={game.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  
-                  <div className="p-6 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-2xl font-bold mb-2">{game.title}</h3>
-                      <p className="text-accent text-sm font-semibold mb-3 uppercase tracking-wide">
-                        {game.genre}
-                      </p>
-                      <p className="text-muted-foreground mb-4 line-clamp-3">
-                        {game.description}
-                      </p>
-                    </div>
-
-                    <div>
-                      <div className="mb-4">
-                        <p className="text-3xl font-bold text-accent">${game.price}</p>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <Button 
-                          className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 glow-gold"
-                          onClick={() => handlePurchase(game.id)}
-                        >
-                          <ShoppingCart className="mr-2" size={18} />
-                          {t('marketplace.buyNow')}
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="icon"
-                          className={`border-accent hover:bg-accent/10 ${wishlist.has(game.id) ? 'text-red-500' : 'text-foreground'}`}
-                          onClick={() => toggleWishlist(game.id)}
-                        >
-                          <Heart size={18} fill={wishlist.has(game.id) ? 'currentColor' : 'none'} />
-                        </Button>
-                      </div>
-
-                      <Link to={`/games/${game.id}`}>
-                        <Button variant="ghost" className="w-full mt-2 hover:bg-accent/10">
-                          {t('marketplace.viewDetails')}
-                        </Button>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+                id={game.id}
+                title={game.title}
+                genre={game.genre}
+                description={game.description}
+                price={game.price}
+                imageUrl={game.image_url}
+                isInWishlist={wishlist.has(game.id)}
+                onToggleWishlist={toggleWishlist}
+                onPurchase={handlePurchase}
+                index={index}
+              />
             ))}
           </div>
 

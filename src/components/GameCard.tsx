@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useGameTranslation } from "@/hooks/useGameTranslation";
+
 interface GameCardProps {
   id: string;
   title: string;
@@ -11,6 +13,11 @@ interface GameCardProps {
 }
 
 const GameCard = ({ id, title, genre, description, image, index }: GameCardProps) => {
+  const { translated, isTranslating } = useGameTranslation({
+    gameId: id,
+    description,
+  });
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -35,7 +42,9 @@ const GameCard = ({ id, title, genre, description, image, index }: GameCardProps
           <div className="flex-1">
             <h3 className="text-2xl font-bold text-primary-foreground mb-2">{title}</h3>
             <p className="text-accent text-sm font-semibold mb-2 uppercase tracking-wide">{genre}</p>
-            <p className="text-primary-foreground/90 text-sm line-clamp-3">{description}</p>
+            <p className={`text-primary-foreground/90 text-sm line-clamp-3 ${isTranslating ? 'opacity-50' : ''}`}>
+              {translated.description}
+            </p>
           </div>
           <ArrowRight className="text-accent flex-shrink-0 ml-4 mt-1" size={32} strokeWidth={2.5} />
         </div>
