@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Instagram, Youtube, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import logoParamita from "@/assets/logo-paramita.png";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -12,9 +11,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <Link to="/">
-              <img src={logoParamita} alt="Paramita Studio" className="h-28 w-auto mb-4" />
-            </Link>
+            <h3 className="text-2xl font-bold text-gradient-gold mb-4">PARAMITA STUDIO</h3>
             <p className="text-sm opacity-90">
               {t('footer.description')}
             </p>
