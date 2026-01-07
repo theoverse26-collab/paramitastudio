@@ -30,6 +30,8 @@ export const useGameTranslation = ({ gameId, description, longDescription = '' }
       return;
     }
 
+    const needsLong = !!longDescription?.trim();
+
     const fetchTranslation = async () => {
       setIsTranslating(true);
 
@@ -42,35 +44,41 @@ export const useGameTranslation = ({ gameId, description, longDescription = '' }
           .eq('language', currentLang)
           .maybeSingle();
 
-        if (cached) {
+        const cachedDesc = cached?.description;
+        const cachedLong = cached?.long_description;
+
+        const hasDesc = !!cachedDesc?.trim() && cachedDesc.trim().toLowerCase() !== 'n/a';
+        const hasLong = !!cachedLong?.trim() && cachedLong.trim().toLowerCase() !== 'n/a';
+
+        // If cache satisfies what we need, use it
+        if (cached && hasDesc && (!needsLong || hasLong)) {
           setTranslated({
-            description: cached.description || description,
-            long_description: cached.long_description || longDescription,
+            description: cachedDesc || description,
+            long_description: cachedLong || longDescription,
           });
-          setIsTranslating(false);
           return;
         }
 
-        // If not cached, call the edge function to translate
+        // Otherwise call backend to translate (and it will upsert cache)
         const { data, error } = await supabase.functions.invoke('translate-game-content', {
           body: {
             game_id: gameId,
             target_language: currentLang,
             description,
-            long_description: longDescription,
+            long_description: needsLong ? longDescription : null,
           },
         });
 
         if (error) {
           console.error('Translation error:', error);
-          // Fallback to original content
           setTranslated({ description, long_description: longDescription });
-        } else if (data) {
-          setTranslated({
-            description: data.description || description,
-            long_description: data.long_description || longDescription,
-          });
+          return;
         }
+
+        setTranslated({
+          description: data?.description || description,
+          long_description: data?.long_description || longDescription,
+        });
       } catch (err) {
         console.error('Translation fetch error:', err);
         setTranslated({ description, long_description: longDescription });
