@@ -113,7 +113,7 @@ const Wishlist = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 py-12">
+      <main className="container mx-auto px-4 pt-28 pb-12">
         <div className="flex items-center gap-3 mb-8">
           <Heart className="w-8 h-8 text-primary fill-primary" />
           <h1 className="text-4xl font-bold">{t('wishlist.title')}</h1>
@@ -188,7 +188,7 @@ const Wishlist = () => {
             ))}
           </div>
         )}
-      </div>
+      </main>
       <Footer />
     </div>
   );
