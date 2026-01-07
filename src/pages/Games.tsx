@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import GameCard from "@/components/GameCard";
@@ -18,6 +19,7 @@ const Games = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchGames();
@@ -34,7 +36,7 @@ const Games = () => {
       setGames(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: 'Failed to load games',
         variant: 'destructive',
       });
@@ -46,7 +48,7 @@ const Games = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading games...</p>
+        <p className="text-muted-foreground">{t('games.loading')}</p>
       </div>
     );
   }
@@ -63,10 +65,10 @@ const Games = () => {
             className="text-center mb-16"
           >
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gradient-gold uppercase">
-              Our Games
+              {t('games.title')}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Explore our collection of immersive gaming experiences crafted with passion and creativity.
+              {t('games.subtitle')}
             </p>
           </motion.div>
 

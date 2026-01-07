@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -28,6 +29,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -70,7 +72,7 @@ const Dashboard = () => {
       setPurchases(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: 'Failed to load your purchases',
         variant: 'destructive',
       });
@@ -82,7 +84,7 @@ const Dashboard = () => {
   const handleDownload = (fileUrl: string | null, gameTitle: string) => {
     if (!fileUrl) {
       toast({
-        title: 'Download Not Available',
+        title: t('dashboard.downloadNotAvailable'),
         description: 'This game file is not available yet.',
         variant: 'destructive',
       });
@@ -90,7 +92,7 @@ const Dashboard = () => {
     }
 
     toast({
-      title: 'Download Started',
+      title: t('dashboard.download'),
       description: `Downloading ${gameTitle}...`,
     });
     window.open(fileUrl, '_blank');
@@ -99,7 +101,7 @@ const Dashboard = () => {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t('dashboard.loading')}</p>
       </div>
     );
   }
@@ -115,10 +117,10 @@ const Dashboard = () => {
             className="mb-16"
           >
             <h1 className="text-5xl md:text-6xl font-bold mb-4 text-gradient-gold uppercase">
-              My Library
+              {t('dashboard.title')}
             </h1>
             <p className="text-xl text-muted-foreground">
-              Access your purchased games and downloads
+              {t('dashboard.subtitle')}
             </p>
           </motion.div>
 
@@ -129,10 +131,10 @@ const Dashboard = () => {
               className="text-center py-20"
             >
               <p className="text-xl text-muted-foreground mb-6">
-                You haven't purchased any games yet.
+                {t('dashboard.noGames')}
               </p>
               <Button onClick={() => navigate('/marketplace')}>
-                Browse Marketplace
+                {t('dashboard.browseMarketplace')}
               </Button>
             </motion.div>
           ) : (
@@ -163,7 +165,7 @@ const Dashboard = () => {
                       className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                     >
                       <Download className="mr-2" size={18} />
-                      Download Game
+                      {t('dashboard.download')}
                     </Button>
                   </div>
                 </motion.div>
