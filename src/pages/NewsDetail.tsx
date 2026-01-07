@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import DOMPurify from "dompurify";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -12,18 +13,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Trash2, MessageCircle, Reply } from "lucide-react";
 
-interface BodyImage {
-  url: string;
-  position: 'middle' | 'bottom';
-}
-
 interface NewsPost {
   id: string;
   title: string;
   content: string;
   published_at: string;
   image_url: string | null;
-  body_images: BodyImage[] | null;
 }
 
 interface Comment {
@@ -37,16 +32,24 @@ interface Comment {
   replies?: Comment[];
 }
 
+// Check if content is HTML (from WYSIWYG editor)
+const isHtmlContent = (content: string): boolean => {
+  return content.includes('<') && content.includes('>');
+};
+
 const NewsDetailContent = ({ news }: { news: NewsPost }) => {
   const { t } = useTranslation();
+  const isHtml = isHtmlContent(news.content);
+  
+  // Only use translation for plain text content
   const { translated, isTranslating } = useNewsTranslation({
     newsId: news.id,
     title: news.title,
-    content: news.content,
+    content: isHtml ? '' : news.content, // Skip translation for HTML content
   });
 
-  const middleImages = news.body_images?.filter(img => img.position === 'middle') || [];
-  const bottomImages = news.body_images?.filter(img => img.position === 'bottom') || [];
+  // Sanitize HTML content
+  const sanitizedContent = isHtml ? DOMPurify.sanitize(news.content) : null;
 
   return (
     <motion.div
@@ -62,7 +65,7 @@ const NewsDetailContent = ({ news }: { news: NewsPost }) => {
           })}
         </div>
         <h1 className={`text-4xl md:text-5xl font-bold mb-6 text-gradient-gold ${isTranslating ? 'opacity-70' : ''}`}>
-          {translated.title}
+          {translated.title || news.title}
         </h1>
       </header>
 
@@ -70,48 +73,22 @@ const NewsDetailContent = ({ news }: { news: NewsPost }) => {
         <div className="mb-8 rounded-xl overflow-hidden">
           <img 
             src={news.image_url} 
-            alt={translated.title} 
+            alt={translated.title || news.title} 
             className="w-full h-auto object-cover"
           />
         </div>
       )}
 
-      <div className="prose prose-lg max-w-none">
-        <p className={`text-lg text-foreground leading-relaxed whitespace-pre-wrap ${isTranslating ? 'opacity-70' : ''}`}>
-          {translated.content}
-        </p>
-      </div>
-
-      {/* Middle images - shown after content */}
-      {middleImages.length > 0 && (
-        <div className="my-8 space-y-6">
-          {middleImages.map((img, index) => (
-            <div key={index} className="rounded-xl overflow-hidden">
-              <img
-                src={img.url}
-                alt={`${translated.title} - Image ${index + 1}`}
-                className="w-full h-auto object-cover"
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Bottom images - gallery style like game screenshots */}
-      {bottomImages.length > 0 && (
-        <div className="mt-12">
-          <h3 className="text-2xl font-bold mb-6">{t('news.gallery') || 'Gallery'}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {bottomImages.map((img, index) => (
-              <div key={index} className="rounded-xl overflow-hidden hover:scale-[1.02] transition-transform duration-300">
-                <img
-                  src={img.url}
-                  alt={`${translated.title} - Gallery ${index + 1}`}
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            ))}
-          </div>
+      {isHtml ? (
+        <div 
+          className="prose prose-lg max-w-none prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-li:text-foreground"
+          dangerouslySetInnerHTML={{ __html: sanitizedContent! }}
+        />
+      ) : (
+        <div className="prose prose-lg max-w-none">
+          <p className={`text-lg text-foreground leading-relaxed whitespace-pre-wrap ${isTranslating ? 'opacity-70' : ''}`}>
+            {translated.content || news.content}
+          </p>
         </div>
       )}
     </motion.div>
@@ -142,30 +119,12 @@ const NewsDetail = () => {
     try {
       const { data, error } = await supabase
         .from('news')
-        .select('*')
+        .select('id, title, content, published_at, image_url')
         .eq('id', id)
         .maybeSingle();
 
       if (error) throw error;
-      
-      if (data) {
-        // Parse body_images from JSON strings to BodyImage objects
-        const parsedBodyImages = (data.body_images || []).map((img: string) => {
-          try {
-            const parsed = JSON.parse(img);
-            return typeof parsed === 'object' ? parsed : { url: img, position: 'bottom' };
-          } catch {
-            return { url: img, position: 'bottom' };
-          }
-        });
-        
-        setNews({
-          ...data,
-          body_images: parsedBodyImages,
-        } as NewsPost);
-      } else {
-        setNews(null);
-      }
+      setNews(data as NewsPost | null);
     } catch (error: any) {
       toast({
         title: t('common.error'),

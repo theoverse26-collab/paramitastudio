@@ -22,6 +22,7 @@ import Wishlist from "./pages/Wishlist";
 import Inbox from "./pages/Inbox";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
+import NewsEditorPage from "./pages/NewsEditorPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,8 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
+              <Route path="/admin/news/new" element={<NewsEditorPage />} />
+              <Route path="/admin/news/edit/:id" element={<NewsEditorPage />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
