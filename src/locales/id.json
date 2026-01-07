@@ -146,14 +146,17 @@
   },
   "gameDetail": {
     "loading": "Memuat detail game...",
-    "features": "Fitur",
+    "aboutGame": "Tentang Game Ini",
+    "features": "Fitur Utama",
     "screenshots": "Screenshot",
+    "price": "Harga",
     "buyNow": "Beli Sekarang",
     "addToWishlist": "Tambah ke Wishlist",
     "removeFromWishlist": "Hapus dari Wishlist",
     "developer": "Pengembang",
     "releaseDate": "Tanggal Rilis",
-    "platform": "Platform"
+    "platform": "Platform",
+    "backToGames": "Kembali ke Game"
   },
   "resetPassword": {
     "title": "Reset Password Anda",

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
@@ -28,12 +29,13 @@ const Wishlist = () => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (authLoading) return;
     
     if (!user) {
-      toast.error("Please log in to view your wishlist");
+      toast.error(t('common.error'));
       navigate("/auth");
       return;
     }
@@ -65,7 +67,7 @@ const Wishlist = () => {
       setWishlist(data || []);
     } catch (error) {
       console.error("Error fetching wishlist:", error);
-      toast.error("Failed to load wishlist");
+      toast.error(t('common.error'));
     } finally {
       setLoading(false);
     }
@@ -81,10 +83,10 @@ const Wishlist = () => {
       if (error) throw error;
 
       setWishlist(wishlist.filter((item) => item.id !== wishlistId));
-      toast.success("Removed from wishlist");
+      toast.success(t('wishlist.remove'));
     } catch (error) {
       console.error("Error removing from wishlist:", error);
-      toast.error("Failed to remove from wishlist");
+      toast.error(t('common.error'));
     }
   };
 
@@ -99,7 +101,7 @@ const Wishlist = () => {
         <div className="flex items-center justify-center h-[50vh]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-            <p className="mt-4 text-muted-foreground">Loading your wishlist...</p>
+            <p className="mt-4 text-muted-foreground">{t('wishlist.loading')}</p>
           </div>
         </div>
         <Footer />
@@ -113,18 +115,18 @@ const Wishlist = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="flex items-center gap-3 mb-8">
           <Heart className="w-8 h-8 text-primary fill-primary" />
-          <h1 className="text-4xl font-bold">My Wishlist</h1>
+          <h1 className="text-4xl font-bold">{t('wishlist.title')}</h1>
         </div>
 
         {wishlist.length === 0 ? (
           <div className="text-center py-20">
             <Heart className="w-20 h-20 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Your wishlist is empty</h2>
+            <h2 className="text-2xl font-bold mb-2">{t('wishlist.empty')}</h2>
             <p className="text-muted-foreground mb-6">
-              Start adding games you're interested in!
+              {t('wishlist.emptyDesc')}
             </p>
             <Button onClick={() => navigate("/marketplace")} size="lg">
-              Browse Marketplace
+              {t('wishlist.browseMarketplace')}
             </Button>
           </div>
         ) : (
@@ -167,7 +169,7 @@ const Wishlist = () => {
                         variant="outline"
                         size="icon"
                         onClick={() => removeFromWishlist(item.id)}
-                        title="Remove from wishlist"
+                        title={t('wishlist.remove')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -176,7 +178,7 @@ const Wishlist = () => {
                         size="sm"
                       >
                         <ShoppingCart className="w-4 h-4 mr-2" />
-                        Buy
+                        {t('wishlist.purchase')}
                       </Button>
                     </div>
                   </div>

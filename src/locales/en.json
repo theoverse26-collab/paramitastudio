@@ -146,14 +146,17 @@
   },
   "gameDetail": {
     "loading": "Loading game details...",
-    "features": "Features",
+    "aboutGame": "About This Game",
+    "features": "Key Features",
     "screenshots": "Screenshots",
+    "price": "Price",
     "buyNow": "Buy Now",
     "addToWishlist": "Add to Wishlist",
     "removeFromWishlist": "Remove from Wishlist",
     "developer": "Developer",
     "releaseDate": "Release Date",
-    "platform": "Platform"
+    "platform": "Platform",
+    "backToGames": "Back to Games"
   },
   "resetPassword": {
     "title": "Reset Your Password",
