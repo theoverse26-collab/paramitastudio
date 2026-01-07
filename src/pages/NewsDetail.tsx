@@ -41,15 +41,17 @@ const NewsDetailContent = ({ news }: { news: NewsPost }) => {
   const { t } = useTranslation();
   const isHtml = isHtmlContent(news.content);
   
-  // Only use translation for plain text content
+  // Always translate content - edge function handles HTML
   const { translated, isTranslating } = useNewsTranslation({
     newsId: news.id,
     title: news.title,
-    content: isHtml ? '' : news.content, // Skip translation for HTML content
+    content: news.content,
   });
 
-  // Sanitize HTML content
-  const sanitizedContent = isHtml ? DOMPurify.sanitize(news.content) : null;
+  // Use translated content (sanitize if HTML)
+  const sanitizedContent = isHtml 
+    ? DOMPurify.sanitize(translated.content || news.content) 
+    : null;
 
   return (
     <motion.div
