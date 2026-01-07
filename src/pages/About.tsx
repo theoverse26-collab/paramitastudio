@@ -12,9 +12,9 @@ const About = () => {
     <div className="min-h-screen">
       <Navbar />
 
-      <div className="pt-24 pb-20">
+      <div className="pb-20">
         {/* Logo Section */}
-        <section className="relative py-24 mb-20 overflow-hidden">
+        <section className="relative pt-32 pb-24 mb-20 overflow-hidden">
           {/* Background Image */}
           <div
             className="absolute inset-0 z-0"
@@ -28,18 +28,17 @@ const About = () => {
           </div>
 
           {/* Floating particles effect */}
-          <div className="absolute inset-0 z-10">
-            {[...Array(15)].map((_, i) => (
+          <div className="absolute inset-0 z-10 overflow-hidden">
+            {[...Array(20)].map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute w-1 h-1 bg-accent rounded-full glow-gold"
-                initial={{
-                  x: `${Math.random() * 100}%`,
-                  y: `${Math.random() * 100}%`,
-                  opacity: 0
+                style={{
+                  left: `${10 + Math.random() * 80}%`,
+                  top: `${Math.random() * 100}%`
                 }}
                 animate={{
-                  y: [null, "-50px", "-100px"],
+                  y: [0, -80, -160],
                   opacity: [0, 1, 0]
                 }}
                 transition={{
