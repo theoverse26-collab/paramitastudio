@@ -121,7 +121,7 @@ const About = () => {
           </div>
         </section>
 
-        {/* Team Section */}
+        {/* Our Journey */}
         <section className="container mx-auto px-4 py-20">
           <motion.h2 initial={{
           opacity: 0,
@@ -132,38 +132,42 @@ const About = () => {
         }} viewport={{
           once: true
         }} className="text-4xl md:text-5xl font-bold text-center mb-16 text-gradient-gold uppercase">
-            Meet Our Team
+            Our Journey
           </motion.h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[{
-            name: "Elena Stormwind",
-            role: "Creative Director",
-            description: "Visionary storyteller with 15+ years in fantasy game design"
-          }, {
-            name: "Marcus Ironforge",
-            role: "Lead Developer",
-            description: "Technical wizard specializing in immersive game mechanics"
-          }, {
-            name: "Luna Silvermoon",
-            role: "Art Director",
-            description: "Master artist bringing magical worlds to life"
-          }].map((member, index) => <motion.div key={index} initial={{
-            opacity: 0,
-            scale: 0.9
-          }} whileInView={{
-            opacity: 1,
-            scale: 1
-          }} viewport={{
-            once: true
-          }} transition={{
-            delay: index * 0.1
-          }} className="bg-card p-6 rounded-xl hover-lift border border-border text-center">
-                <div className="w-32 h-32 bg-gradient-to-br from-primary to-accent rounded-full mx-auto mb-4" />
-                <h3 className="text-xl font-bold mb-2">{member.name}</h3>
-                <p className="text-accent font-semibold mb-2 uppercase text-sm">{member.role}</p>
-                <p className="text-muted-foreground text-sm">{member.description}</p>
-              </motion.div>)}
+          <div className="max-w-4xl mx-auto">
+            <div className="space-y-8">
+              {[{
+                year: "2024",
+                title: "The Beginning",
+                description: "Paramita Studio was founded with a vision to create immersive fantasy gaming experiences that captivate players worldwide."
+              }, {
+                year: "2024",
+                title: "First Steps",
+                description: "We began developing our flagship titles, focusing on blending innovative gameplay with rich storytelling and stunning visuals."
+              }, {
+                year: "2025",
+                title: "Growing Stronger",
+                description: "Expanding our creative horizons, we continue to push boundaries in game design while building a passionate community of players."
+              }].map((milestone, index) => (
+                <motion.div 
+                  key={index} 
+                  initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }} 
+                  whileInView={{ opacity: 1, x: 0 }} 
+                  viewport={{ once: true }} 
+                  transition={{ delay: index * 0.15 }}
+                  className="flex gap-6 items-start"
+                >
+                  <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-br from-accent to-primary rounded-xl flex items-center justify-center">
+                    <span className="text-xl font-bold text-primary-foreground">{milestone.year}</span>
+                  </div>
+                  <div className="bg-card p-6 rounded-xl border border-border hover-lift flex-1">
+                    <h3 className="text-xl font-bold mb-2">{milestone.title}</h3>
+                    <p className="text-muted-foreground">{milestone.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
       </div>

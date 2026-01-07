@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ArrowRight } from "lucide-react";
 
 interface NewsPost {
   id: string;
   title: string;
   content: string;
   published_at: string;
+  image_url: string | null;
 }
 
 const News = () => {
@@ -78,13 +81,36 @@ const News = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
-                  className="bg-card rounded-xl p-8 border border-border hover-lift parchment-card"
                 >
-                  <div className="mb-2 text-sm text-accent font-semibold uppercase tracking-wide">
-                    {new Date(item.published_at).toLocaleDateString()}
-                  </div>
-                  <h3 className="text-2xl font-bold mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground whitespace-pre-wrap">{item.content}</p>
+                  <Link 
+                    to={`/news/${item.id}`}
+                    className="block bg-card rounded-xl overflow-hidden border border-border hover-lift parchment-card group transition-all duration-300"
+                  >
+                    {item.image_url && (
+                      <div className="aspect-video overflow-hidden">
+                        <img 
+                          src={item.image_url} 
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                    )}
+                    <div className="p-8">
+                      <div className="mb-2 text-sm text-accent font-semibold uppercase tracking-wide">
+                        {new Date(item.published_at).toLocaleDateString()}
+                      </div>
+                      <h3 className="text-2xl font-bold mb-3 group-hover:text-accent transition-colors">
+                        {item.title}
+                      </h3>
+                      <p className="text-muted-foreground line-clamp-3">
+                        {item.content}
+                      </p>
+                      <div className="mt-4 flex items-center gap-2 text-accent font-semibold">
+                        Read More
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </div>
+                    </div>
+                  </Link>
                 </motion.div>
               ))}
             </div>
@@ -98,3 +124,4 @@ const News = () => {
 };
 
 export default News;
+
