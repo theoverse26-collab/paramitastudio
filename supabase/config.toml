@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.translate-news-content]
 verify_jwt = false
+
+[functions.download-game]
+verify_jwt = false
