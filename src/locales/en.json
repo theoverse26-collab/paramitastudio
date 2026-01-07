@@ -180,7 +180,8 @@
     "noGames": "You haven't purchased any games yet.",
     "browseMarketplace": "Browse Marketplace",
     "download": "Download",
-    "downloadNotAvailable": "Download not available yet"
+    "downloadNotAvailable": "Download not available yet",
+    "downloadStarted": "Download Started"
   },
   "wishlist": {
     "title": "My Wishlist",
