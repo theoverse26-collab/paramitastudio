@@ -49,7 +49,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-primary-foreground/20 mt-8 pt-8 text-center text-sm opacity-75">
-          <p>&copy; 2024 Paramita Studio. {t('footer.allRightsReserved')}</p>
+          <p>&copy; 2026 Paramita Studio. {t('footer.allRightsReserved')}</p>
         </div>
       </div>
     </footer>
