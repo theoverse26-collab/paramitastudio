@@ -42,10 +42,12 @@ const Inbox = () => {
   }, [user]);
 
   const fetchNotifications = async () => {
+    if (!user) return;
     try {
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -58,11 +60,13 @@ const Inbox = () => {
   };
 
   const markAsRead = async (id: string) => {
+    if (!user) return;
     try {
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
       if (error) throw error;
       setNotifications(prev =>
@@ -74,10 +78,12 @@ const Inbox = () => {
   };
 
   const markAllAsRead = async () => {
+    if (!user) return;
     try {
       const { error } = await supabase
         .from('notifications')
         .update({ is_read: true })
+        .eq('user_id', user.id)
         .eq('is_read', false);
 
       if (error) throw error;
@@ -92,11 +98,13 @@ const Inbox = () => {
   };
 
   const deleteNotification = async (id: string) => {
+    if (!user) return;
     try {
       const { error } = await supabase
         .from('notifications')
         .delete()
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id);
 
       if (error) throw error;
       setNotifications(prev => prev.filter(n => n.id !== id));
