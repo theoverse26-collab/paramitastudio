@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Target, Eye, Heart } from "lucide-react";
+import { Target, Eye, Heart, Gamepad2, BookOpen } from "lucide-react";
 const About = () => {
   return <div className="min-h-screen">
       <Navbar />
@@ -121,54 +121,99 @@ const About = () => {
           </div>
         </section>
 
-        {/* Our Journey */}
+        {/* What We're Building */}
         <section className="container mx-auto px-4 py-20">
-          <motion.h2 initial={{
-          opacity: 0,
-          y: 20
-        }} whileInView={{
-          opacity: 1,
-          y: 0
-        }} viewport={{
-          once: true
-        }} className="text-4xl md:text-5xl font-bold text-center mb-16 text-gradient-gold uppercase">
-            Our Journey
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }} 
+            className="text-4xl md:text-5xl font-bold text-center mb-6 text-gradient-gold uppercase"
+          >
+            What We're Building
           </motion.h2>
+          
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-xl text-center text-muted-foreground mb-16 max-w-2xl mx-auto"
+          >
+            Action-packed 2D games with strong storytelling at their core.
+          </motion.p>
 
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-8">
-              {[{
-                year: "2024",
-                title: "The Beginning",
-                description: "Paramita Studio was founded with a vision to create immersive fantasy gaming experiences that captivate players worldwide."
-              }, {
-                year: "2024",
-                title: "First Steps",
-                description: "We began developing our flagship titles, focusing on blending innovative gameplay with rich storytelling and stunning visuals."
-              }, {
-                year: "2025",
-                title: "Growing Stronger",
-                description: "Expanding our creative horizons, we continue to push boundaries in game design while building a passionate community of players."
-              }].map((milestone, index) => (
-                <motion.div 
-                  key={index} 
-                  initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }} 
-                  whileInView={{ opacity: 1, x: 0 }} 
-                  viewport={{ once: true }} 
-                  transition={{ delay: index * 0.15 }}
-                  className="flex gap-6 items-start"
-                >
-                  <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-br from-accent to-primary rounded-xl flex items-center justify-center">
-                    <span className="text-xl font-bold text-primary-foreground">{milestone.year}</span>
-                  </div>
-                  <div className="bg-card p-6 rounded-xl border border-border hover-lift flex-1">
-                    <h3 className="text-xl font-bold mb-2">{milestone.title}</h3>
-                    <p className="text-muted-foreground">{milestone.description}</p>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            {/* Game Development Card */}
+            <motion.div 
+              initial={{ opacity: 0, x: -30 }} 
+              whileInView={{ opacity: 1, x: 0 }} 
+              viewport={{ once: true }}
+              className="bg-card p-8 rounded-xl border border-border hover-lift"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-accent to-primary rounded-lg flex items-center justify-center">
+                  <Gamepad2 className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h3 className="text-2xl font-bold">RPG Maker Mastery</h3>
+              </div>
+              <p className="text-muted-foreground leading-relaxed">
+                Using RPG Maker as our foundation, we push far beyond traditional expectations—creating 
+                fast-paced action combat, hack-and-slash systems, and gameplay ranging from semi-open worlds 
+                to tight, story-driven linear adventures.
+              </p>
+            </motion.div>
+
+            {/* Storytelling Card */}
+            <motion.div 
+              initial={{ opacity: 0, x: 30 }} 
+              whileInView={{ opacity: 1, x: 0 }} 
+              viewport={{ once: true }}
+              className="bg-card p-8 rounded-xl border border-border hover-lift"
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-accent to-primary rounded-lg flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-primary-foreground" />
+                </div>
+                <h3 className="text-2xl font-bold">Original Universes</h3>
+              </div>
+              <p className="text-muted-foreground leading-relaxed">
+                Every game exists in a fully original universe, with its own lore, characters, and identity. 
+                Story is never an afterthought—it shapes gameplay, world design, and player experience.
+              </p>
+            </motion.div>
           </div>
+
+          {/* Value Proposition */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }} 
+            whileInView={{ opacity: 1, y: 0 }} 
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto bg-gradient-to-r from-accent/10 via-primary/10 to-accent/10 p-8 md:p-12 rounded-2xl border border-accent/20 text-center"
+          >
+            <div className="flex justify-center gap-6 mb-6">
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-accent">3+</div>
+                <div className="text-sm text-muted-foreground">Hours of Gameplay</div>
+              </div>
+              <div className="w-px bg-border"></div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-accent">$1-$3</div>
+                <div className="text-sm text-muted-foreground">Accessible Pricing</div>
+              </div>
+              <div className="w-px bg-border"></div>
+              <div className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-accent">100%</div>
+                <div className="text-sm text-muted-foreground">Polished Quality</div>
+              </div>
+            </div>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-6">
+              As a small studio, we work smart and efficiently. Low production costs never mean low standards—we 
+              apply the same discipline as large-scale productions.
+            </p>
+            <p className="text-xl font-semibold text-foreground">
+              Meaningful, high-energy, story-driven games that feel worth far more than their price.
+            </p>
+          </motion.div>
         </section>
       </div>
 
