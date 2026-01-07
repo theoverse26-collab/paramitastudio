@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { Instagram, Youtube, Linkedin } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import logoParamita from "@/assets/logo-paramita.png";
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -39,20 +39,13 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Social */}
-          <div>
-            <h4 className="font-semibold mb-4 text-accent">{t('footer.followUs')}</h4>
-            <div className="flex gap-4">
-              <a href="https://www.youtube.com/@Alcuinex" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-fantasy">
-                <Youtube size={20} />
-              </a>
-              <a href="https://id.linkedin.com/company/alcuinex" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-fantasy">
-                <Linkedin size={20} />
-              </a>
-              <a href="https://www.instagram.com/alcuinex.official/" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-fantasy">
-                <Instagram size={20} />
-              </a>
-            </div>
+          {/* Logo */}
+          <div className="flex items-center justify-center md:justify-end">
+            <img 
+              src={logoParamita} 
+              alt="Paramita Studio Logo" 
+              className="h-24 w-auto object-contain"
+            />
           </div>
         </div>
 
