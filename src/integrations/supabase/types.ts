@@ -22,6 +22,8 @@ export type Database = {
           id: string
           language: string
           long_description: string | null
+          source_description: string | null
+          source_long_description: string | null
         }
         Insert: {
           created_at?: string
@@ -30,6 +32,8 @@ export type Database = {
           id?: string
           language: string
           long_description?: string | null
+          source_description?: string | null
+          source_long_description?: string | null
         }
         Update: {
           created_at?: string
@@ -38,6 +42,8 @@ export type Database = {
           id?: string
           language?: string
           long_description?: string | null
+          source_description?: string | null
+          source_long_description?: string | null
         }
         Relationships: [
           {
@@ -177,6 +183,47 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "news_comments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      news_translations: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          language: string
+          news_id: string
+          source_content: string | null
+          source_title: string | null
+          title: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          language: string
+          news_id: string
+          source_content?: string | null
+          source_title?: string | null
+          title?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          language?: string
+          news_id?: string
+          source_content?: string | null
+          source_title?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "news_translations_news_id_fkey"
+            columns: ["news_id"]
+            isOneToOne: false
+            referencedRelation: "news"
             referencedColumns: ["id"]
           },
         ]

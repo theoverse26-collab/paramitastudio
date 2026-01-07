@@ -181,5 +181,67 @@
   "language": {
     "en": "Inggris",
     "id": "Indonesia"
+  },
+  "admin": {
+    "title": "Dashboard Admin",
+    "subtitle": "Kelola game, berita, dan lihat analitik",
+    "tabs": {
+      "games": "Game",
+      "news": "Berita",
+      "analytics": "Analitik"
+    },
+    "games": {
+      "loading": "Memuat game...",
+      "addGame": "Tambah Game",
+      "editGame": "Edit Game",
+      "addNewGame": "Tambah Game Baru",
+      "title": "Judul",
+      "genre": "Genre",
+      "shortDescription": "Deskripsi Singkat",
+      "longDescription": "Deskripsi Lengkap",
+      "price": "Harga ($)",
+      "cardImageUrl": "URL Gambar Kartu Game",
+      "cardImagePlaceholder": "Rekomendasi: lebar 800px",
+      "heroImageUrl": "URL Gambar Banner Hero (opsional)",
+      "heroImagePlaceholder": "Rekomendasi: lebar 1920px. Gunakan gambar kartu jika kosong.",
+      "fileUrl": "URL File Unduhan (opsional)",
+      "developer": "Pengembang",
+      "releaseDate": "Tanggal Rilis",
+      "platform": "Platform",
+      "platformPlaceholder": "contoh: PC, PlayStation, Xbox",
+      "features": "Fitur Utama (satu per baris)",
+      "featuresPlaceholder": "Cerita epik\nGrafis memukau\nMode multiplayer",
+      "screenshots": "URL Screenshot (satu per baris)",
+      "screenshotsPlaceholder": "https://example.com/screenshot1.jpg\nhttps://example.com/screenshot2.jpg",
+      "updateGame": "Perbarui Game",
+      "deleteConfirm": "Apakah Anda yakin ingin menghapus game ini?",
+      "successAdded": "Game berhasil ditambahkan",
+      "successUpdated": "Game berhasil diperbarui",
+      "successDeleted": "Game berhasil dihapus",
+      "errorLoad": "Gagal memuat game"
+    },
+    "news": {
+      "loading": "Memuat berita...",
+      "createPost": "Buat Postingan",
+      "editPost": "Edit Postingan Berita",
+      "createNewPost": "Buat Postingan Berita",
+      "title": "Judul",
+      "imageUrl": "URL Gambar (opsional)",
+      "imagePlaceholder": "https://example.com/image.jpg",
+      "content": "Konten",
+      "updatePost": "Perbarui Postingan",
+      "deleteConfirm": "Apakah Anda yakin ingin menghapus postingan berita ini?",
+      "successCreated": "Postingan berita berhasil dibuat",
+      "successUpdated": "Postingan berita berhasil diperbarui",
+      "successDeleted": "Postingan berita berhasil dihapus",
+      "errorLoad": "Gagal memuat berita"
+    },
+    "analytics": {
+      "loading": "Memuat analitik...",
+      "totalRevenue": "Total Pendapatan",
+      "totalSales": "Total Penjualan",
+      "registeredUsers": "Pengguna Terdaftar",
+      "gamesListed": "Game Terdaftar"
+    }
   }
 }

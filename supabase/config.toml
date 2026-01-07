@@ -11,3 +11,6 @@ verify_jwt = false
 
 [functions.translate-game-content]
 verify_jwt = false
+
+[functions.translate-news-content]
+verify_jwt = false

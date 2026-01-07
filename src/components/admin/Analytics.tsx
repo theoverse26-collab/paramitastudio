@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Download, Users, ShoppingCart } from 'lucide-react';
@@ -18,6 +19,7 @@ const Analytics = () => {
     totalGames: 0,
   });
   const [loading, setLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchAnalytics();
@@ -63,14 +65,14 @@ const Analytics = () => {
   };
 
   if (loading) {
-    return <p className="text-muted-foreground">Loading analytics...</p>;
+    return <p className="text-muted-foreground">{t('admin.analytics.loading')}</p>;
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('admin.analytics.totalRevenue')}</CardTitle>
           <DollarSign className="h-4 w-4 text-accent" />
         </CardHeader>
         <CardContent>
@@ -82,7 +84,7 @@ const Analytics = () => {
 
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('admin.analytics.totalSales')}</CardTitle>
           <ShoppingCart className="h-4 w-4 text-accent" />
         </CardHeader>
         <CardContent>
@@ -92,7 +94,7 @@ const Analytics = () => {
 
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Registered Users</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('admin.analytics.registeredUsers')}</CardTitle>
           <Users className="h-4 w-4 text-accent" />
         </CardHeader>
         <CardContent>
@@ -102,7 +104,7 @@ const Analytics = () => {
 
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Games Listed</CardTitle>
+          <CardTitle className="text-sm font-medium">{t('admin.analytics.gamesListed')}</CardTitle>
           <Download className="h-4 w-4 text-accent" />
         </CardHeader>
         <CardContent>

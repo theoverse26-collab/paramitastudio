@@ -181,5 +181,67 @@
   "language": {
     "en": "English",
     "id": "Indonesian"
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "subtitle": "Manage games, news, and view analytics",
+    "tabs": {
+      "games": "Games",
+      "news": "News",
+      "analytics": "Analytics"
+    },
+    "games": {
+      "loading": "Loading games...",
+      "addGame": "Add Game",
+      "editGame": "Edit Game",
+      "addNewGame": "Add New Game",
+      "title": "Title",
+      "genre": "Genre",
+      "shortDescription": "Short Description",
+      "longDescription": "Long Description",
+      "price": "Price ($)",
+      "cardImageUrl": "Game Card Image URL",
+      "cardImagePlaceholder": "Recommended: 800px width",
+      "heroImageUrl": "Hero Banner Image URL (optional)",
+      "heroImagePlaceholder": "Recommended: 1920px width. Falls back to card image if empty.",
+      "fileUrl": "Download File URL (optional)",
+      "developer": "Developer",
+      "releaseDate": "Release Date",
+      "platform": "Platform",
+      "platformPlaceholder": "e.g., PC, PlayStation, Xbox",
+      "features": "Key Features (one per line)",
+      "featuresPlaceholder": "Epic storyline\nStunning graphics\nMultiplayer mode",
+      "screenshots": "Screenshot URLs (one per line)",
+      "screenshotsPlaceholder": "https://example.com/screenshot1.jpg\nhttps://example.com/screenshot2.jpg",
+      "updateGame": "Update Game",
+      "deleteConfirm": "Are you sure you want to delete this game?",
+      "successAdded": "Game added successfully",
+      "successUpdated": "Game updated successfully",
+      "successDeleted": "Game deleted successfully",
+      "errorLoad": "Failed to load games"
+    },
+    "news": {
+      "loading": "Loading news...",
+      "createPost": "Create Post",
+      "editPost": "Edit News Post",
+      "createNewPost": "Create News Post",
+      "title": "Title",
+      "imageUrl": "Image URL (optional)",
+      "imagePlaceholder": "https://example.com/image.jpg",
+      "content": "Content",
+      "updatePost": "Update Post",
+      "deleteConfirm": "Are you sure you want to delete this news post?",
+      "successCreated": "News post created successfully",
+      "successUpdated": "News post updated successfully",
+      "successDeleted": "News post deleted successfully",
+      "errorLoad": "Failed to load news"
+    },
+    "analytics": {
+      "loading": "Loading analytics...",
+      "totalRevenue": "Total Revenue",
+      "totalSales": "Total Sales",
+      "registeredUsers": "Registered Users",
+      "gamesListed": "Games Listed"
+    }
   }
 }
