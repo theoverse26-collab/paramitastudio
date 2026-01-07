@@ -39,23 +39,31 @@ export const useGameTranslation = ({ gameId, description, longDescription = '' }
         // First check cache directly from database
         const { data: cached } = await supabase
           .from('game_translations')
-          .select('description, long_description')
+          .select('description, long_description, source_description, source_long_description')
           .eq('game_id', gameId)
           .eq('language', currentLang)
           .maybeSingle();
 
         const cachedDesc = cached?.description;
         const cachedLong = cached?.long_description;
+        const sourceDesc = cached?.source_description;
+        const sourceLong = cached?.source_long_description;
 
         const hasDesc = !!cachedDesc?.trim() && cachedDesc.trim().toLowerCase() !== 'n/a';
         const hasLong = !!cachedLong?.trim() && cachedLong.trim().toLowerCase() !== 'n/a';
 
-        // If cache satisfies what we need, use it
-        if (cached && hasDesc && (!needsLong || hasLong)) {
+        // Check if source content matches (cache is valid)
+        const descMatches = sourceDesc === description;
+        const longMatches = !needsLong || sourceLong === longDescription;
+        const cacheValid = descMatches && longMatches;
+
+        // If cache is valid and has what we need, use it
+        if (cached && cacheValid && hasDesc && (!needsLong || hasLong)) {
           setTranslated({
             description: cachedDesc || description,
             long_description: cachedLong || longDescription,
           });
+          setIsTranslating(false);
           return;
         }
 
