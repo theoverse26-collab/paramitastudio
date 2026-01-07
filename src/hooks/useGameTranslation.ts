@@ -24,8 +24,8 @@ export const useGameTranslation = ({ gameId, description, longDescription = '' }
   useEffect(() => {
     const currentLang = i18n.language;
 
-    // If English or no gameId, use original content
-    if (currentLang === 'en' || !gameId) {
+    // If no gameId, use original content
+    if (!gameId) {
       setTranslated({ description, long_description: longDescription });
       return;
     }
