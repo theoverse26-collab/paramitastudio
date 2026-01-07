@@ -116,6 +116,7 @@ export type Database = {
         Row: {
           author_id: string
           body_images: string[] | null
+          category: string | null
           content: string
           id: string
           image_url: string | null
@@ -126,6 +127,7 @@ export type Database = {
         Insert: {
           author_id: string
           body_images?: string[] | null
+          category?: string | null
           content: string
           id?: string
           image_url?: string | null
@@ -136,6 +138,7 @@ export type Database = {
         Update: {
           author_id?: string
           body_images?: string[] | null
+          category?: string | null
           content?: string
           id?: string
           image_url?: string | null

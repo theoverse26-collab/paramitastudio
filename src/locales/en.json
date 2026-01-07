@@ -224,7 +224,8 @@
     "delete": "Delete",
     "submit": "Submit",
     "back": "Back",
-    "add": "Add"
+    "add": "Add",
+    "all": "All"
   },
   "profile": {
     "title": "My Profile",

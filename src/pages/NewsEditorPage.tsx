@@ -14,6 +14,7 @@ const NewsEditorPage = () => {
     title: string;
     content: string;
     image_url: string;
+    category: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(!!id);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,6 +42,7 @@ const NewsEditorPage = () => {
           title: data.title,
           content: data.content,
           image_url: data.image_url || '',
+          category: data.category || 'general',
         });
       } catch (error) {
         console.error('Error fetching news:', error);
@@ -58,7 +60,7 @@ const NewsEditorPage = () => {
     fetchNews();
   }, [id, navigate]);
 
-  const handleSave = async (data: { title: string; content: string; image_url: string }) => {
+  const handleSave = async (data: { title: string; content: string; image_url: string; category: string }) => {
     if (!user) return;
     
     setIsSubmitting(true);
@@ -71,6 +73,7 @@ const NewsEditorPage = () => {
             title: data.title,
             content: data.content,
             image_url: data.image_url || null,
+            category: data.category,
             updated_at: new Date().toISOString(),
           })
           .eq('id', id);
@@ -89,6 +92,7 @@ const NewsEditorPage = () => {
             title: data.title,
             content: data.content,
             image_url: data.image_url || null,
+            category: data.category,
             author_id: user.id,
           });
 
@@ -137,6 +141,7 @@ const NewsEditorPage = () => {
           initialTitle={initialData?.title}
           initialContent={initialData?.content}
           initialImageUrl={initialData?.image_url}
+          initialCategory={initialData?.category}
           onSave={handleSave}
           onCancel={handleCancel}
           isSubmitting={isSubmitting}

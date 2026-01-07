@@ -23,26 +23,45 @@ import {
   DialogTitle,
   DialogFooter,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 interface NewsEditorProps {
   initialTitle?: string;
   initialContent?: string;
   initialImageUrl?: string;
-  onSave: (data: { title: string; content: string; image_url: string }) => Promise<void>;
+  initialCategory?: string;
+  onSave: (data: { title: string; content: string; image_url: string; category: string }) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
 }
+
+const CATEGORIES = [
+  'general',
+  'update',
+  'announcement',
+  'devlog',
+  'event',
+  'release',
+];
 
 const NewsEditor = ({
   initialTitle = '',
   initialContent = '',
   initialImageUrl = '',
+  initialCategory = 'general',
   onSave,
   onCancel,
   isSubmitting = false,
 }: NewsEditorProps) => {
   const [title, setTitle] = useState(initialTitle);
   const [imageUrl, setImageUrl] = useState(initialImageUrl);
+  const [category, setCategory] = useState(initialCategory);
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState('');
 
@@ -74,6 +93,7 @@ const NewsEditor = ({
       title: title.trim(),
       content: editor?.getHTML() || '',
       image_url: imageUrl,
+      category,
     });
   };
 
@@ -106,13 +126,28 @@ const NewsEditor = ({
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
         <div className="absolute bottom-8 left-0 right-0 px-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-4xl mx-auto space-y-3">
             <Input
               value={imageUrl}
               onChange={(e) => setImageUrl(e.target.value)}
               placeholder="Enter featured image URL..."
-              className="bg-background/80 backdrop-blur-sm mb-4"
+              className="bg-background/80 backdrop-blur-sm"
             />
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-foreground/80">Category:</span>
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-[180px] bg-background/80 backdrop-blur-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CATEGORIES.map((cat) => (
+                    <SelectItem key={cat} value={cat} className="capitalize">
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>

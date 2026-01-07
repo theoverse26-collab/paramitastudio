@@ -224,7 +224,8 @@
     "delete": "Hapus",
     "submit": "Kirim",
     "back": "Kembali",
-    "add": "Tambah"
+    "add": "Tambah",
+    "all": "Semua"
   },
   "profile": {
     "title": "Profil Saya",
