@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +20,7 @@ const News = () => {
   const [news, setNews] = useState<NewsPost[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchNews();
@@ -35,7 +37,7 @@ const News = () => {
       setNews(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: 'Failed to load news',
         variant: 'destructive',
       });
@@ -47,7 +49,7 @@ const News = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading news...</p>
+        <p className="text-muted-foreground">{t('news.loading')}</p>
       </div>
     );
   }
@@ -64,15 +66,15 @@ const News = () => {
             className="text-center mb-16"
           >
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gradient-gold uppercase">
-              Latest News
+              {t('news.title')}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Stay updated with the latest announcements, updates, and events from Paramita Studio.
+              {t('news.subtitle')}
             </p>
           </motion.div>
 
           {news.length === 0 ? (
-            <p className="text-center text-muted-foreground">No news posts yet.</p>
+            <p className="text-center text-muted-foreground">{t('news.noNews')}</p>
           ) : (
             <div className="max-w-4xl mx-auto space-y-6">
               {news.map((item, index) => (
@@ -106,7 +108,7 @@ const News = () => {
                         {item.content}
                       </p>
                       <div className="mt-4 flex items-center gap-2 text-accent font-semibold">
-                        Read More
+                        {t('news.readMore')}
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
@@ -124,4 +126,3 @@ const News = () => {
 };
 
 export default News;
-

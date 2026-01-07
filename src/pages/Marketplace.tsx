@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ const Marketplace = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchGames();
@@ -44,7 +46,7 @@ const Marketplace = () => {
       setGames(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: 'Failed to load games',
         variant: 'destructive',
       });
@@ -72,7 +74,7 @@ const Marketplace = () => {
   const toggleWishlist = async (gameId: string) => {
     if (!user) {
       toast({
-        title: 'Login Required',
+        title: t('common.error'),
         description: 'Please login to add games to wishlist',
       });
       navigate('/auth');
@@ -98,7 +100,7 @@ const Marketplace = () => {
         });
 
         toast({
-          title: 'Removed from wishlist',
+          title: t('marketplace.removeFromWishlist'),
         });
       } else {
         const { error } = await supabase
@@ -110,12 +112,12 @@ const Marketplace = () => {
         setWishlist(prev => new Set([...prev, gameId]));
 
         toast({
-          title: 'Added to wishlist',
+          title: t('marketplace.addToWishlist'),
         });
       }
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -125,7 +127,7 @@ const Marketplace = () => {
   const handlePurchase = (gameId: string) => {
     if (!user) {
       toast({
-        title: 'Login Required',
+        title: t('common.error'),
         description: 'Please login to purchase games',
       });
       navigate('/auth');
@@ -138,7 +140,7 @@ const Marketplace = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading marketplace...</p>
+        <p className="text-muted-foreground">{t('marketplace.loading')}</p>
       </div>
     );
   }
@@ -155,11 +157,10 @@ const Marketplace = () => {
             className="text-center mb-16"
           >
             <h1 className="text-5xl md:text-6xl font-bold mb-6 text-gradient-gold uppercase">
-              Marketplace
+              {t('marketplace.title')}
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Purchase your favorite games directly from our store. All games come with lifetime updates 
-              and dedicated customer support.
+              {t('marketplace.subtitle')}
             </p>
           </motion.div>
 
@@ -203,7 +204,7 @@ const Marketplace = () => {
                           onClick={() => handlePurchase(game.id)}
                         >
                           <ShoppingCart className="mr-2" size={18} />
-                          Buy Now
+                          {t('marketplace.buyNow')}
                         </Button>
                         <Button 
                           variant="outline" 
@@ -217,7 +218,7 @@ const Marketplace = () => {
 
                       <Link to={`/games/${game.id}`}>
                         <Button variant="ghost" className="w-full mt-2 hover:bg-accent/10">
-                          View Details
+                          {t('marketplace.viewDetails')}
                         </Button>
                       </Link>
                     </div>
