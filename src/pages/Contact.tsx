@@ -225,10 +225,11 @@ const Contact = () => {
 
             {/* FAQ Section - Compact Grid */}
             <motion.div
+              id="faq"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mt-16"
+              className="mt-16 scroll-mt-28"
             >
               <h2 className="text-2xl font-bold mb-6 text-center">{t('contact.faqTitle')}</h2>
               
