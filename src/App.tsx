@@ -21,6 +21,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import Wishlist from "./pages/Wishlist";
 import Inbox from "./pages/Inbox";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/inbox" element={<Inbox />} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/admin" element={<Admin />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

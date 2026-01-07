@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, User, LogOut, Heart } from "lucide-react";
+import { Menu, X, User, LogOut, Heart, Mail, LayoutDashboard, Shield } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "./NavLink";
 import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import LanguageSwitcher from "./LanguageSwitcher";
-import InboxBell from "./InboxBell";
+import UserMenu from "./UserMenu";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +23,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <NavLink to="/">{t('nav.home')}</NavLink>
             <NavLink to="/about">{t('nav.about')}</NavLink>
             <NavLink to="/games">{t('nav.games')}</NavLink>
@@ -31,29 +31,17 @@ const Navbar = () => {
             <NavLink to="/news">{t('nav.news')}</NavLink>
             <NavLink to="/contact">{t('nav.contact')}</NavLink>
             
+            {user && isAdmin && (
+              <NavLink to="/admin">
+                <Shield size={16} className="inline mr-1" />
+                {t('nav.admin')}
+              </NavLink>
+            )}
+            
             <LanguageSwitcher />
             
             {user ? (
-              <>
-                <NavLink to="/wishlist">
-                  <Heart size={18} className="inline mr-1" />
-                  {t('nav.wishlist')}
-                </NavLink>
-                <InboxBell />
-                <NavLink to={isAdmin ? "/admin" : "/dashboard"}>
-                  <User size={18} className="inline mr-1" />
-                  {isAdmin ? t('nav.admin') : t('nav.dashboard')}
-                </NavLink>
-                <Button
-                  onClick={signOut}
-                  variant="outline"
-                  size="sm"
-                  className="border-accent text-foreground hover:bg-accent/10"
-                >
-                  <LogOut size={16} className="mr-2" />
-                  {t('nav.logout')}
-                </Button>
-              </>
+              <UserMenu />
             ) : (
               <Button
                 onClick={() => navigate('/auth')}
@@ -89,18 +77,36 @@ const Navbar = () => {
             
             {user ? (
               <>
-                <Link to="/wishlist" className="block px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>{t('nav.wishlist')}</Link>
-                <Link to="/inbox" className="block px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>{t('nav.inbox')}</Link>
-                <Link to={isAdmin ? "/admin" : "/dashboard"} className="block px-4 py-2 text-foreground hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>
-                  {isAdmin ? t('nav.admin') : t('nav.dashboard')}
+                {isAdmin && (
+                  <Link to="/admin" className="flex items-center gap-2 px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>
+                    <Shield size={16} />
+                    {t('nav.admin')}
+                  </Link>
+                )}
+                <Link to="/profile" className="flex items-center gap-2 px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>
+                  <User size={16} />
+                  {t('nav.profile')}
+                </Link>
+                <Link to="/dashboard" className="flex items-center gap-2 px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>
+                  <LayoutDashboard size={16} />
+                  {t('nav.dashboard')}
+                </Link>
+                <Link to="/wishlist" className="flex items-center gap-2 px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>
+                  <Heart size={16} />
+                  {t('nav.wishlist')}
+                </Link>
+                <Link to="/inbox" className="flex items-center gap-2 px-4 py-2 hover:text-accent transition-fantasy" onClick={() => setIsOpen(false)}>
+                  <Mail size={16} />
+                  {t('nav.inbox')}
                 </Link>
                 <button
                   onClick={() => {
                     signOut();
                     setIsOpen(false);
                   }}
-                  className="block w-full text-left px-4 py-2 text-accent hover:bg-accent/10 rounded"
+                  className="flex items-center gap-2 w-full text-left px-4 py-2 text-destructive hover:bg-destructive/10 rounded"
                 >
+                  <LogOut size={16} />
                   {t('nav.logout')}
                 </button>
               </>
