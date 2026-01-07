@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
+import { Eye, EyeOff } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -24,6 +25,7 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const { signUp, signIn, resetPassword } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -175,14 +177,24 @@ const Auth = () => {
               {mode !== 'forgot' && (
                 <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    required
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Enter your password"
+                      required
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
               )}
 
@@ -201,11 +213,11 @@ const Auth = () => {
               </Button>
             </form>
 
-            {mode === 'login' && (
+            {mode === 'login' && email.includes('@') && (
               <div className="mt-4 text-center">
                 <button
                   onClick={() => setMode('forgot')}
-                  className="text-muted-foreground hover:text-accent text-sm"
+                  className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
                   Forgot your password?
                 </button>
@@ -216,17 +228,20 @@ const Auth = () => {
               {mode === 'forgot' ? (
                 <button
                   onClick={() => setMode('login')}
-                  className="text-accent hover:text-accent/80 text-sm"
+                  className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
                 >
                   Back to Login
                 </button>
               ) : (
-                <button
-                  onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-                  className="text-accent hover:text-accent/80 text-sm"
-                >
-                  {mode === 'login' ? "Don't have an account? Sign up" : 'Already have an account? Login'}
-                </button>
+                <p className="text-sm text-muted-foreground">
+                  {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+                  <button
+                    onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+                    className="text-primary hover:text-primary/80 font-medium transition-colors"
+                  >
+                    {mode === 'login' ? 'Sign up' : 'Login'}
+                  </button>
+                </p>
               )}
             </div>
           </div>
