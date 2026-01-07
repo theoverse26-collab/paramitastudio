@@ -13,7 +13,7 @@ serve(async (req) => {
 
   try {
     const { game_id, target_language, description, long_description } = await req.json();
-    
+
     if (!game_id || !target_language) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: game_id, target_language' }),
@@ -24,7 +24,10 @@ serve(async (req) => {
     // If target is English, just return the original content
     if (target_language === 'en') {
       return new Response(
-        JSON.stringify({ description, long_description }),
+        JSON.stringify({
+          description: description ?? '',
+          long_description: long_description ?? '',
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -43,6 +46,17 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    const needsDesc = typeof description === 'string' && description.trim().length > 0;
+    const needsLong = typeof long_description === 'string' && long_description.trim().length > 0;
+
+    // If there's nothing to translate, return originals without caching
+    if (!needsDesc && !needsLong) {
+      return new Response(
+        JSON.stringify({ description: description ?? '', long_description: long_description ?? '' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     // Check if translation already exists in cache
     const { data: existingTranslation } = await supabase
       .from('game_translations')
@@ -51,49 +65,65 @@ serve(async (req) => {
       .eq('language', target_language)
       .maybeSingle();
 
-    if (existingTranslation) {
+    // If cache has what we need, return it
+    const cachedDesc = existingTranslation?.description;
+    const cachedLong = existingTranslation?.long_description;
+    const cachedHasDesc = !!cachedDesc?.trim() && cachedDesc.trim().toLowerCase() !== 'n/a';
+    const cachedHasLong = !!cachedLong?.trim() && cachedLong.trim().toLowerCase() !== 'n/a';
+
+    if (existingTranslation && (!needsDesc || cachedHasDesc) && (!needsLong || cachedHasLong)) {
       console.log('Returning cached translation for', game_id, target_language);
       return new Response(
-        JSON.stringify(existingTranslation),
+        JSON.stringify({
+          description: cachedDesc || (description ?? ''),
+          long_description: cachedLong || (long_description ?? ''),
+        }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Get language name for better translation
     const languageNames: Record<string, string> = {
-      'id': 'Indonesian',
-      'ja': 'Japanese',
-      'ko': 'Korean',
-      'zh': 'Chinese',
-      'es': 'Spanish',
+      id: 'Indonesian',
+      ja: 'Japanese',
+      ko: 'Korean',
+      zh: 'Chinese',
+      es: 'Spanish',
     };
     const targetLangName = languageNames[target_language] || target_language;
 
     // Translate using Lovable AI
-    const prompt = `Translate the following game descriptions to ${targetLangName}. 
-Return ONLY a JSON object with exactly two keys: "description" and "long_description".
-Do not include any other text, markdown formatting, or code blocks.
-
-Short description: ${description || 'N/A'}
-
-Long description: ${long_description || 'N/A'}`;
+    const promptParts = [
+      `Translate the following video game text to ${targetLangName}.`,
+      `Return ONLY a JSON object with exactly two keys: "description" and "long_description".`,
+      `Rules:`,
+      `- If a field is missing/empty, return an empty string for that field (NOT "N/A").`,
+      `- No markdown, no code fences, JSON only.`,
+      '',
+      `Short description:`,
+      needsDesc ? description : '',
+      '',
+      `Long description:`,
+      needsLong ? long_description : '',
+    ];
 
     console.log('Calling Lovable AI for translation to', targetLangName);
-    
+
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${lovableApiKey}`,
+        Authorization: `Bearer ${lovableApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         model: 'google/gemini-2.5-flash',
         messages: [
-          { 
-            role: 'system', 
-            content: 'You are a professional translator specializing in video game content. Translate naturally while preserving gaming terminology and the original tone. Always respond with valid JSON only.' 
+          {
+            role: 'system',
+            content:
+              'You are a professional translator specializing in video game content. Translate naturally while preserving gaming terminology and tone. Respond with valid JSON only.',
           },
-          { role: 'user', content: prompt }
+          { role: 'user', content: promptParts.join('\n') },
         ],
       }),
     });
@@ -101,7 +131,7 @@ Long description: ${long_description || 'N/A'}`;
     if (!aiResponse.ok) {
       const errorText = await aiResponse.text();
       console.error('AI translation failed:', aiResponse.status, errorText);
-      
+
       if (aiResponse.status === 429) {
         return new Response(
           JSON.stringify({ error: 'Translation rate limit exceeded. Please try again later.' }),
@@ -114,7 +144,7 @@ Long description: ${long_description || 'N/A'}`;
           { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      
+
       return new Response(
         JSON.stringify({ error: 'Translation service error' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -123,7 +153,7 @@ Long description: ${long_description || 'N/A'}`;
 
     const aiData = await aiResponse.json();
     const content = aiData.choices?.[0]?.message?.content;
-    
+
     if (!content) {
       console.error('No content in AI response');
       return new Response(
@@ -133,18 +163,12 @@ Long description: ${long_description || 'N/A'}`;
     }
 
     // Parse the JSON response (handle potential markdown code blocks)
-    let translatedContent;
+    let translatedContent: any;
     try {
       let jsonStr = content.trim();
-      // Remove markdown code blocks if present
-      if (jsonStr.startsWith('```json')) {
-        jsonStr = jsonStr.slice(7);
-      } else if (jsonStr.startsWith('```')) {
-        jsonStr = jsonStr.slice(3);
-      }
-      if (jsonStr.endsWith('```')) {
-        jsonStr = jsonStr.slice(0, -3);
-      }
+      if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
+      else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
+      if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
       translatedContent = JSON.parse(jsonStr.trim());
     } catch (parseError) {
       console.error('Failed to parse AI response:', content);
@@ -154,27 +178,41 @@ Long description: ${long_description || 'N/A'}`;
       );
     }
 
-    // Cache the translation
-    const { error: insertError } = await supabase
-      .from('game_translations')
-      .insert({
-        game_id,
-        language: target_language,
-        description: translatedContent.description || description,
-        long_description: translatedContent.long_description || long_description,
-      });
+    const clean = (v: unknown) => {
+      if (typeof v !== 'string') return '';
+      const s = v.trim();
+      if (!s) return '';
+      if (s.toLowerCase() === 'n/a') return '';
+      return s;
+    };
 
-    if (insertError) {
-      console.error('Failed to cache translation:', insertError);
-      // Don't fail the request, just log the error
+    const translatedDesc = needsDesc ? clean(translatedContent.description) : '';
+    const translatedLong = needsLong ? clean(translatedContent.long_description) : '';
+
+    // Upsert the translation cache (service role bypasses RLS)
+    const upsertPayload: Record<string, any> = {
+      game_id,
+      language: target_language,
+    };
+
+    // Only write fields that were requested; never write "N/A"
+    if (needsDesc) upsertPayload.description = translatedDesc || description;
+    if (needsLong) upsertPayload.long_description = translatedLong || long_description;
+
+    const { error: upsertError } = await supabase
+      .from('game_translations')
+      .upsert(upsertPayload, { onConflict: 'game_id,language' });
+
+    if (upsertError) {
+      console.error('Failed to upsert translation cache:', upsertError);
     } else {
-      console.log('Cached translation for', game_id, target_language);
+      console.log('Upserted translation for', game_id, target_language);
     }
 
     return new Response(
       JSON.stringify({
-        description: translatedContent.description || description,
-        long_description: translatedContent.long_description || long_description,
+        description: needsDesc ? (translatedDesc || description || '') : (description ?? ''),
+        long_description: needsLong ? (translatedLong || long_description || '') : (long_description ?? ''),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Globe, ChevronDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,21 +22,23 @@ const LanguageSwitcher = () => {
   };
 
   return (
-    <div className="w-[70px] flex-shrink-0">
-      <DropdownMenu>
+    <div className="w-[76px] flex-shrink-0">
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <button 
-            className="flex items-center gap-1 px-2 py-1.5 text-sm text-primary-foreground hover:text-accent transition-colors w-full justify-center focus:outline-none focus:ring-0 focus-visible:ring-0 focus-visible:outline-none"
+          <button
+            type="button"
+            className="inline-flex w-full items-center justify-center gap-1 rounded-full border border-primary-foreground/20 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-foreground backdrop-blur hover:bg-primary/15 transition-colors focus:outline-none focus:ring-0 focus-visible:ring-0"
+            aria-label="Change language"
           >
-            <Globe className="h-4 w-4 flex-shrink-0" />
+            <span aria-hidden className="text-base leading-none">{currentLanguage.flag}</span>
             <span className="w-5 text-center">{currentLanguage.name}</span>
             <ChevronDown className="h-3 w-3 opacity-70 flex-shrink-0" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent 
-          align="end" 
-          className="bg-card border-border shadow-lg min-w-[120px]"
-          sideOffset={8}
+        <DropdownMenuContent
+          align="end"
+          className="bg-card border-border shadow-lg min-w-[140px]"
+          sideOffset={10}
         >
           {languages.map((lang) => (
             <DropdownMenuItem
