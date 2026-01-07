@@ -180,12 +180,12 @@ const GameDetail = () => {
             >
               <Link
                 to="/games"
-                className="inline-flex items-center gap-2 text-primary-foreground mb-4 hover:text-accent transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-background/80 backdrop-blur-sm text-foreground hover:bg-background transition-colors shadow-md"
               >
-                <ArrowLeft size={20} />
+                <ArrowLeft size={18} />
                 {t('gameDetail.backToGames')}
               </Link>
-              <h1 className="text-5xl md:text-6xl font-bold mb-4 uppercase text-sky-950">
+              <h1 className="text-5xl md:text-6xl font-bold mb-4 mt-4 uppercase text-sky-950">
                 {game.title}
               </h1>
               <p className="text-xl font-semibold uppercase tracking-wide text-blue-900">
