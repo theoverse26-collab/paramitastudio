@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,7 @@ const GamesManagement = () => {
   const [editingGame, setEditingGame] = useState<Game | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -105,8 +107,8 @@ const GamesManagement = () => {
       setGames(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: 'Failed to load games',
+        title: t('common.error'),
+        description: t('admin.games.errorLoad'),
         variant: 'destructive',
       });
     } finally {
@@ -143,8 +145,8 @@ const GamesManagement = () => {
         if (error) throw error;
 
         toast({
-          title: 'Success',
-          description: 'Game updated successfully',
+          title: t('common.success'),
+          description: t('admin.games.successUpdated'),
         });
       } else {
         const { error } = await supabase.from('games').insert([gameData]);
@@ -152,8 +154,8 @@ const GamesManagement = () => {
         if (error) throw error;
 
         toast({
-          title: 'Success',
-          description: 'Game added successfully',
+          title: t('common.success'),
+          description: t('admin.games.successAdded'),
         });
       }
 
@@ -162,7 +164,7 @@ const GamesManagement = () => {
       fetchGames();
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -170,7 +172,7 @@ const GamesManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this game?')) return;
+    if (!confirm(t('admin.games.deleteConfirm'))) return;
 
     try {
       const { error } = await supabase.from('games').delete().eq('id', id);
@@ -178,13 +180,13 @@ const GamesManagement = () => {
       if (error) throw error;
 
       toast({
-        title: 'Success',
-        description: 'Game deleted successfully',
+        title: t('common.success'),
+        description: t('admin.games.successDeleted'),
       });
       fetchGames();
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -192,7 +194,7 @@ const GamesManagement = () => {
   };
 
   if (loading) {
-    return <p className="text-muted-foreground">Loading games...</p>;
+    return <p className="text-muted-foreground">{t('admin.games.loading')}</p>;
   }
 
   return (
@@ -208,18 +210,18 @@ const GamesManagement = () => {
               className="bg-accent text-accent-foreground hover:bg-accent/90"
             >
               <Plus className="mr-2" size={18} />
-              Add Game
+              {t('admin.games.addGame')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {editingGame ? 'Edit Game' : 'Add New Game'}
+                {editingGame ? t('admin.games.editGame') : t('admin.games.addNewGame')}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">{t('admin.games.title')}</Label>
                 <Input
                   id="title"
                   value={formData.title}
@@ -228,7 +230,7 @@ const GamesManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="genre">Genre</Label>
+                <Label htmlFor="genre">{t('admin.games.genre')}</Label>
                 <Input
                   id="genre"
                   value={formData.genre}
@@ -237,7 +239,7 @@ const GamesManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Short Description</Label>
+                <Label htmlFor="description">{t('admin.games.shortDescription')}</Label>
                 <Textarea
                   id="description"
                   value={formData.description}
@@ -246,7 +248,7 @@ const GamesManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="long_description">Long Description</Label>
+                <Label htmlFor="long_description">{t('admin.games.longDescription')}</Label>
                 <Textarea
                   id="long_description"
                   value={formData.long_description}
@@ -256,7 +258,7 @@ const GamesManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="price">Price ($)</Label>
+                <Label htmlFor="price">{t('admin.games.price')}</Label>
                 <Input
                   id="price"
                   type="number"
@@ -267,26 +269,26 @@ const GamesManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="image_url">Game Card Image URL</Label>
+                <Label htmlFor="image_url">{t('admin.games.cardImageUrl')}</Label>
                 <Input
                   id="image_url"
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="Recommended: 800px width"
+                  placeholder={t('admin.games.cardImagePlaceholder')}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="hero_image_url">Hero Banner Image URL (optional)</Label>
+                <Label htmlFor="hero_image_url">{t('admin.games.heroImageUrl')}</Label>
                 <Input
                   id="hero_image_url"
                   value={formData.hero_image_url}
                   onChange={(e) => setFormData({ ...formData, hero_image_url: e.target.value })}
-                  placeholder="Recommended: 1920px width. Falls back to card image if empty."
+                  placeholder={t('admin.games.heroImagePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="file_url">Download File URL (optional)</Label>
+                <Label htmlFor="file_url">{t('admin.games.fileUrl')}</Label>
                 <Input
                   id="file_url"
                   value={formData.file_url}
@@ -294,7 +296,7 @@ const GamesManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="developer">Developer</Label>
+                <Label htmlFor="developer">{t('admin.games.developer')}</Label>
                 <Input
                   id="developer"
                   value={formData.developer}
@@ -303,7 +305,7 @@ const GamesManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="release_date">Release Date</Label>
+                <Label htmlFor="release_date">{t('admin.games.releaseDate')}</Label>
                 <Input
                   id="release_date"
                   value={formData.release_date}
@@ -312,37 +314,37 @@ const GamesManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="platform">Platform</Label>
+                <Label htmlFor="platform">{t('admin.games.platform')}</Label>
                 <Input
                   id="platform"
                   value={formData.platform}
                   onChange={(e) => setFormData({ ...formData, platform: e.target.value })}
-                  placeholder="e.g., PC, PlayStation, Xbox"
+                  placeholder={t('admin.games.platformPlaceholder')}
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="features">Key Features (one per line)</Label>
+                <Label htmlFor="features">{t('admin.games.features')}</Label>
                 <Textarea
                   id="features"
                   value={formData.features}
                   onChange={(e) => setFormData({ ...formData, features: e.target.value })}
                   rows={5}
-                  placeholder="Epic storyline&#10;Stunning graphics&#10;Multiplayer mode"
+                  placeholder={t('admin.games.featuresPlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="screenshots">Screenshot URLs (one per line)</Label>
+                <Label htmlFor="screenshots">{t('admin.games.screenshots')}</Label>
                 <Textarea
                   id="screenshots"
                   value={formData.screenshots}
                   onChange={(e) => setFormData({ ...formData, screenshots: e.target.value })}
                   rows={5}
-                  placeholder="https://example.com/screenshot1.jpg&#10;https://example.com/screenshot2.jpg"
+                  placeholder={t('admin.games.screenshotsPlaceholder')}
                 />
               </div>
               <Button type="submit" className="w-full">
-                {editingGame ? 'Update Game' : 'Add Game'}
+                {editingGame ? t('admin.games.updateGame') : t('admin.games.addGame')}
               </Button>
             </form>
           </DialogContent>

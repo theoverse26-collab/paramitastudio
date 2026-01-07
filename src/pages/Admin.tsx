@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/contexts/AuthContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -12,6 +13,7 @@ import Analytics from '@/components/admin/Analytics';
 const Admin = () => {
   const { user, loading: authLoading, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -28,7 +30,7 @@ const Admin = () => {
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t('common.loading')}</p>
       </div>
     );
   }
@@ -48,18 +50,18 @@ const Admin = () => {
             className="mb-12"
           >
             <h1 className="text-5xl md:text-6xl font-bold mb-4 text-gradient-gold uppercase">
-              Admin Dashboard
+              {t('admin.title')}
             </h1>
             <p className="text-xl text-muted-foreground">
-              Manage games, news, and view analytics
+              {t('admin.subtitle')}
             </p>
           </motion.div>
 
           <Tabs defaultValue="games" className="w-full">
             <TabsList className="grid w-full grid-cols-3 mb-8">
-              <TabsTrigger value="games">Games</TabsTrigger>
-              <TabsTrigger value="news">News</TabsTrigger>
-              <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              <TabsTrigger value="games">{t('admin.tabs.games')}</TabsTrigger>
+              <TabsTrigger value="news">{t('admin.tabs.news')}</TabsTrigger>
+              <TabsTrigger value="analytics">{t('admin.tabs.analytics')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="games">

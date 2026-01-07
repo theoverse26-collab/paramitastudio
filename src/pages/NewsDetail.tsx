@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNewsTranslation } from "@/hooks/useNewsTranslation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Trash2, MessageCircle, Reply } from "lucide-react";
@@ -29,6 +30,51 @@ interface Comment {
   user_email?: string;
   replies?: Comment[];
 }
+
+const NewsDetailContent = ({ news }: { news: NewsPost }) => {
+  const { t } = useTranslation();
+  const { translated, isTranslating } = useNewsTranslation({
+    newsId: news.id,
+    title: news.title,
+    content: news.content,
+  });
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={{ opacity: 1, y: 0 }}
+    >
+      <header className="mb-8">
+        <div className="text-sm text-accent font-semibold uppercase tracking-wide mb-4">
+          {new Date(news.published_at).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          })}
+        </div>
+        <h1 className={`text-4xl md:text-5xl font-bold mb-6 text-gradient-gold ${isTranslating ? 'opacity-70' : ''}`}>
+          {translated.title}
+        </h1>
+      </header>
+
+      {news.image_url && (
+        <div className="mb-8 rounded-xl overflow-hidden">
+          <img 
+            src={news.image_url} 
+            alt={translated.title} 
+            className="w-full h-auto object-cover"
+          />
+        </div>
+      )}
+
+      <div className="prose prose-lg max-w-none">
+        <p className={`text-lg text-foreground leading-relaxed whitespace-pre-wrap ${isTranslating ? 'opacity-70' : ''}`}>
+          {translated.content}
+        </p>
+      </div>
+    </motion.div>
+  );
+};
 
 const NewsDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -294,39 +340,7 @@ const NewsDetail = () => {
             {t('news.backToNews')}
           </Link>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-          >
-            <header className="mb-8">
-              <div className="text-sm text-accent font-semibold uppercase tracking-wide mb-4">
-                {new Date(news.published_at).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6 text-gradient-gold">
-                {news.title}
-              </h1>
-            </header>
-
-            {news.image_url && (
-              <div className="mb-8 rounded-xl overflow-hidden">
-                <img 
-                  src={news.image_url} 
-                  alt={news.title} 
-                  className="w-full h-auto object-cover"
-                />
-              </div>
-            )}
-
-            <div className="prose prose-lg max-w-none">
-              <p className="text-lg text-foreground leading-relaxed whitespace-pre-wrap">
-                {news.content}
-              </p>
-            </div>
-          </motion.div>
+          <NewsDetailContent news={news} />
 
           <motion.section
             initial={{ opacity: 0, y: 30 }}

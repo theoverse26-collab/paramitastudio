@@ -12,11 +12,11 @@ serve(async (req) => {
   }
 
   try {
-    const { game_id, target_language, description, long_description } = await req.json();
+    const { news_id, target_language, title, content } = await req.json();
 
-    if (!game_id || !target_language) {
+    if (!news_id || !target_language) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: game_id, target_language' }),
+        JSON.stringify({ error: 'Missing required fields: news_id, target_language' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -24,10 +24,7 @@ serve(async (req) => {
     // If target is English, just return the original content
     if (target_language === 'en') {
       return new Response(
-        JSON.stringify({
-          description: description ?? '',
-          long_description: long_description ?? '',
-        }),
+        JSON.stringify({ title: title ?? '', content: content ?? '' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -46,52 +43,51 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    const needsDesc = typeof description === 'string' && description.trim().length > 0;
-    const needsLong = typeof long_description === 'string' && long_description.trim().length > 0;
+    const needsTitle = typeof title === 'string' && title.trim().length > 0;
+    const needsContent = typeof content === 'string' && content.trim().length > 0;
 
-    // If there's nothing to translate, return originals without caching
-    if (!needsDesc && !needsLong) {
+    // If there's nothing to translate, return originals
+    if (!needsTitle && !needsContent) {
       return new Response(
-        JSON.stringify({ description: description ?? '', long_description: long_description ?? '' }),
+        JSON.stringify({ title: title ?? '', content: content ?? '' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Check if translation already exists in cache
     const { data: existingTranslation } = await supabase
-      .from('game_translations')
-      .select('description, long_description, source_description, source_long_description')
-      .eq('game_id', game_id)
+      .from('news_translations')
+      .select('title, content, source_title, source_content')
+      .eq('news_id', news_id)
       .eq('language', target_language)
       .maybeSingle();
 
-    // Check if cached translation is valid (source content matches current content)
-    const cachedDesc = existingTranslation?.description;
-    const cachedLong = existingTranslation?.long_description;
-    const sourceDesc = existingTranslation?.source_description;
-    const sourceLong = existingTranslation?.source_long_description;
-    
-    const cachedHasDesc = !!cachedDesc?.trim() && cachedDesc.trim().toLowerCase() !== 'n/a';
-    const cachedHasLong = !!cachedLong?.trim() && cachedLong.trim().toLowerCase() !== 'n/a';
-    
-    // Check if source content has changed (cache invalidation)
-    const descSourceMatches = !needsDesc || sourceDesc === description;
-    const longSourceMatches = !needsLong || sourceLong === long_description;
-    const cacheValid = descSourceMatches && longSourceMatches;
+    const cachedTitle = existingTranslation?.title;
+    const cachedContent = existingTranslation?.content;
+    const sourceTitle = existingTranslation?.source_title;
+    const sourceContent = existingTranslation?.source_content;
 
-    if (existingTranslation && cacheValid && (!needsDesc || cachedHasDesc) && (!needsLong || cachedHasLong)) {
-      console.log('Returning cached translation for', game_id, target_language);
+    const cachedHasTitle = !!cachedTitle?.trim();
+    const cachedHasContent = !!cachedContent?.trim();
+
+    // Check if source content has changed (cache invalidation)
+    const titleSourceMatches = !needsTitle || sourceTitle === title;
+    const contentSourceMatches = !needsContent || sourceContent === content;
+    const cacheValid = titleSourceMatches && contentSourceMatches;
+
+    if (existingTranslation && cacheValid && (!needsTitle || cachedHasTitle) && (!needsContent || cachedHasContent)) {
+      console.log('Returning cached translation for news', news_id, target_language);
       return new Response(
         JSON.stringify({
-          description: cachedDesc || (description ?? ''),
-          long_description: cachedLong || (long_description ?? ''),
+          title: cachedTitle || (title ?? ''),
+          content: cachedContent || (content ?? ''),
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     if (existingTranslation && !cacheValid) {
-      console.log('Cache invalidated for', game_id, target_language, '- source content changed');
+      console.log('Cache invalidated for news', news_id, target_language, '- source content changed');
     }
 
     // Get language name for better translation
@@ -106,20 +102,21 @@ serve(async (req) => {
 
     // Translate using Lovable AI
     const promptParts = [
-      `Translate the following video game text to ${targetLangName}.`,
-      `Return ONLY a JSON object with exactly two keys: "description" and "long_description".`,
+      `Translate the following news article text to ${targetLangName}.`,
+      `Return ONLY a JSON object with exactly two keys: "title" and "content".`,
       `Rules:`,
-      `- If a field is missing/empty, return an empty string for that field (NOT "N/A").`,
+      `- If a field is missing/empty, return an empty string for that field.`,
+      `- Preserve paragraph breaks and formatting.`,
       `- No markdown, no code fences, JSON only.`,
       '',
-      `Short description:`,
-      needsDesc ? description : '',
+      `Title:`,
+      needsTitle ? title : '',
       '',
-      `Long description:`,
-      needsLong ? long_description : '',
+      `Content:`,
+      needsContent ? content : '',
     ];
 
-    console.log('Calling Lovable AI for translation to', targetLangName);
+    console.log('Calling Lovable AI for news translation to', targetLangName);
 
     const aiResponse = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
@@ -132,8 +129,7 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content:
-              'You are a professional translator specializing in video game content. Translate naturally while preserving gaming terminology and tone. Respond with valid JSON only.',
+            content: 'You are a professional translator. Translate naturally while preserving the tone and style of the original. Respond with valid JSON only.',
           },
           { role: 'user', content: promptParts.join('\n') },
         ],
@@ -164,9 +160,9 @@ serve(async (req) => {
     }
 
     const aiData = await aiResponse.json();
-    const content = aiData.choices?.[0]?.message?.content;
+    const responseContent = aiData.choices?.[0]?.message?.content;
 
-    if (!content) {
+    if (!responseContent) {
       console.error('No content in AI response');
       return new Response(
         JSON.stringify({ error: 'Translation failed - no response' }),
@@ -174,68 +170,59 @@ serve(async (req) => {
       );
     }
 
-    // Parse the JSON response (handle potential markdown code blocks)
+    // Parse the JSON response
     let translatedContent: any;
     try {
-      let jsonStr = content.trim();
+      let jsonStr = responseContent.trim();
       if (jsonStr.startsWith('```json')) jsonStr = jsonStr.slice(7);
       else if (jsonStr.startsWith('```')) jsonStr = jsonStr.slice(3);
       if (jsonStr.endsWith('```')) jsonStr = jsonStr.slice(0, -3);
       translatedContent = JSON.parse(jsonStr.trim());
     } catch (parseError) {
-      console.error('Failed to parse AI response:', content);
+      console.error('Failed to parse AI response:', responseContent);
       return new Response(
         JSON.stringify({ error: 'Translation parsing failed' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const clean = (v: unknown) => {
-      if (typeof v !== 'string') return '';
-      const s = v.trim();
-      if (!s) return '';
-      if (s.toLowerCase() === 'n/a') return '';
-      return s;
-    };
-
-    const translatedDesc = needsDesc ? clean(translatedContent.description) : '';
-    const translatedLong = needsLong ? clean(translatedContent.long_description) : '';
+    const translatedTitle = needsTitle ? (translatedContent.title?.trim() || title) : '';
+    const translatedContentText = needsContent ? (translatedContent.content?.trim() || content) : '';
 
     // Upsert the translation cache with source content for cache invalidation
     const upsertPayload: Record<string, any> = {
-      game_id,
+      news_id,
       language: target_language,
     };
 
-    // Store both translated content and source content for cache invalidation
-    if (needsDesc) {
-      upsertPayload.description = translatedDesc || description;
-      upsertPayload.source_description = description;
+    if (needsTitle) {
+      upsertPayload.title = translatedTitle;
+      upsertPayload.source_title = title;
     }
-    if (needsLong) {
-      upsertPayload.long_description = translatedLong || long_description;
-      upsertPayload.source_long_description = long_description;
+    if (needsContent) {
+      upsertPayload.content = translatedContentText;
+      upsertPayload.source_content = content;
     }
 
     const { error: upsertError } = await supabase
-      .from('game_translations')
-      .upsert(upsertPayload, { onConflict: 'game_id,language' });
+      .from('news_translations')
+      .upsert(upsertPayload, { onConflict: 'news_id,language' });
 
     if (upsertError) {
-      console.error('Failed to upsert translation cache:', upsertError);
+      console.error('Failed to upsert news translation cache:', upsertError);
     } else {
-      console.log('Upserted translation for', game_id, target_language);
+      console.log('Upserted news translation for', news_id, target_language);
     }
 
     return new Response(
       JSON.stringify({
-        description: needsDesc ? (translatedDesc || description || '') : (description ?? ''),
-        long_description: needsLong ? (translatedLong || long_description || '') : (long_description ?? ''),
+        title: needsTitle ? translatedTitle : (title ?? ''),
+        content: needsContent ? translatedContentText : (content ?? ''),
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
-    console.error('Error in translate-game-content:', error);
+    console.error('Error in translate-news-content:', error);
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +29,7 @@ const NewsManagement = () => {
   const [editingPost, setEditingPost] = useState<NewsPost | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const [formData, setFormData] = useState({
     title: '',
@@ -66,8 +68,8 @@ const NewsManagement = () => {
       setNews(data || []);
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: 'Failed to load news',
+        title: t('common.error'),
+        description: t('admin.news.errorLoad'),
         variant: 'destructive',
       });
     } finally {
@@ -98,8 +100,8 @@ const NewsManagement = () => {
         if (error) throw error;
 
         toast({
-          title: 'Success',
-          description: 'News post updated successfully',
+          title: t('common.success'),
+          description: t('admin.news.successUpdated'),
         });
       } else {
         const { error } = await supabase.from('news').insert([newsData]);
@@ -107,8 +109,8 @@ const NewsManagement = () => {
         if (error) throw error;
 
         toast({
-          title: 'Success',
-          description: 'News post created successfully',
+          title: t('common.success'),
+          description: t('admin.news.successCreated'),
         });
       }
 
@@ -117,7 +119,7 @@ const NewsManagement = () => {
       fetchNews();
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -125,7 +127,7 @@ const NewsManagement = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this news post?')) return;
+    if (!confirm(t('admin.news.deleteConfirm'))) return;
 
     try {
       const { error } = await supabase.from('news').delete().eq('id', id);
@@ -133,13 +135,13 @@ const NewsManagement = () => {
       if (error) throw error;
 
       toast({
-        title: 'Success',
-        description: 'News post deleted successfully',
+        title: t('common.success'),
+        description: t('admin.news.successDeleted'),
       });
       fetchNews();
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: error.message,
         variant: 'destructive',
       });
@@ -147,7 +149,7 @@ const NewsManagement = () => {
   };
 
   if (loading) {
-    return <p className="text-muted-foreground">Loading news...</p>;
+    return <p className="text-muted-foreground">{t('admin.news.loading')}</p>;
   }
 
   return (
@@ -163,18 +165,18 @@ const NewsManagement = () => {
               className="bg-accent text-accent-foreground hover:bg-accent/90"
             >
               <Plus className="mr-2" size={18} />
-              Create Post
+              {t('admin.news.createPost')}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
-                {editingPost ? 'Edit News Post' : 'Create News Post'}
+                {editingPost ? t('admin.news.editPost') : t('admin.news.createNewPost')}
               </DialogTitle>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="title">Title</Label>
+                <Label htmlFor="title">{t('admin.news.title')}</Label>
                 <Input
                   id="title"
                   value={formData.title}
@@ -183,16 +185,16 @@ const NewsManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="image_url">Image URL (optional)</Label>
+                <Label htmlFor="image_url">{t('admin.news.imageUrl')}</Label>
                 <Input
                   id="image_url"
                   value={formData.image_url}
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                  placeholder="https://example.com/image.jpg"
+                  placeholder={t('admin.news.imagePlaceholder')}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="content">Content</Label>
+                <Label htmlFor="content">{t('admin.news.content')}</Label>
                 <Textarea
                   id="content"
                   value={formData.content}
@@ -202,7 +204,7 @@ const NewsManagement = () => {
                 />
               </div>
               <Button type="submit" className="w-full">
-                {editingPost ? 'Update Post' : 'Create Post'}
+                {editingPost ? t('admin.news.updatePost') : t('admin.news.createPost')}
               </Button>
             </form>
           </DialogContent>
