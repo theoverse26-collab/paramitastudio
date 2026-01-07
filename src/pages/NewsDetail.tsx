@@ -12,6 +12,7 @@ import { useNewsTranslation } from "@/hooks/useNewsTranslation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Trash2, MessageCircle, Reply } from "lucide-react";
+import { EmojiPicker } from "@/components/EmojiPicker";
 
 interface NewsPost {
   id: string;
@@ -299,7 +300,8 @@ const NewsDetail = () => {
               onChange={(e) => setReplyContent(e.target.value)}
               className="bg-background min-h-[80px]"
             />
-            <div className="flex gap-2">
+            <div className="flex items-center gap-2">
+              <EmojiPicker onEmojiSelect={(emoji) => setReplyContent(prev => prev + emoji)} />
               <Button
                 size="sm"
                 onClick={() => handleSubmitComment(comment.id)}
@@ -385,13 +387,16 @@ const NewsDetail = () => {
                   onChange={(e) => setNewComment(e.target.value)}
                   className="bg-background min-h-[100px] mb-4"
                 />
-                <Button
-                  onClick={() => handleSubmitComment()}
-                  disabled={submitting || !newComment.trim()}
-                  className="bg-accent text-accent-foreground hover:bg-accent/90"
-                >
-                  {t('news.postComment')}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <EmojiPicker onEmojiSelect={(emoji) => setNewComment(prev => prev + emoji)} />
+                  <Button
+                    onClick={() => handleSubmitComment()}
+                    disabled={submitting || !newComment.trim()}
+                    className="bg-accent text-accent-foreground hover:bg-accent/90"
+                  >
+                    {t('news.postComment')}
+                  </Button>
+                </div>
               </div>
             ) : (
               <div className="bg-card rounded-xl p-6 border border-border mb-8 text-center">
