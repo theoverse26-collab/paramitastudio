@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Download, Users, ShoppingCart } from 'lucide-react';
-import { formatPrice } from '@/utils/currency';
+import { formatPriceFromIDR } from '@/utils/currency';
 
 interface AnalyticsData {
   totalSales: number;
@@ -80,7 +80,7 @@ const Analytics = () => {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-foreground">
-            {formatPrice(analytics.totalRevenue, i18n.language)}
+            {formatPriceFromIDR(analytics.totalRevenue, i18n.language)}
           </div>
         </CardContent>
       </Card>
