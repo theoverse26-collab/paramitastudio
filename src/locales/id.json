@@ -180,7 +180,8 @@
     "noGames": "Anda belum membeli game apapun.",
     "browseMarketplace": "Jelajahi Marketplace",
     "download": "Unduh",
-    "downloadNotAvailable": "Unduhan belum tersedia"
+    "downloadNotAvailable": "Unduhan belum tersedia",
+    "downloadStarted": "Unduhan Dimulai"
   },
   "wishlist": {
     "title": "Wishlist Saya",

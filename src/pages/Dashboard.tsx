@@ -81,7 +81,9 @@ const Dashboard = () => {
     }
   };
 
-  const handleDownload = (fileUrl: string | null, gameTitle: string) => {
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+
+  const handleDownload = async (fileUrl: string | null, gameTitle: string, purchaseId: string) => {
     if (!fileUrl) {
       toast({
         title: t('dashboard.downloadNotAvailable'),
@@ -91,11 +93,43 @@ const Dashboard = () => {
       return;
     }
 
+    setDownloadingId(purchaseId);
+    
     toast({
       title: t('dashboard.download'),
-      description: `Downloading ${gameTitle}...`,
+      description: `Preparing ${gameTitle} for download...`,
     });
-    window.open(fileUrl, '_blank');
+
+    try {
+      const response = await fetch(fileUrl);
+      
+      if (!response.ok) {
+        throw new Error('Download failed');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${gameTitle.replace(/[^a-zA-Z0-9]/g, '-')}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: t('dashboard.downloadStarted'),
+        description: `${gameTitle} download started!`,
+      });
+    } catch (error) {
+      toast({
+        title: t('common.error'),
+        description: 'Failed to download the game. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setDownloadingId(null);
+    }
   };
 
   if (authLoading || loading) {
@@ -161,11 +195,21 @@ const Dashboard = () => {
                       Purchased: {new Date(purchase.purchase_date).toLocaleDateString()}
                     </p>
                     <Button
-                      onClick={() => handleDownload(purchase.game.file_url, purchase.game.title)}
+                      onClick={() => handleDownload(purchase.game.file_url, purchase.game.title, purchase.id)}
                       className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                      disabled={downloadingId === purchase.id}
                     >
-                      <Download className="mr-2" size={18} />
-                      {t('dashboard.download')}
+                      {downloadingId === purchase.id ? (
+                        <>
+                          <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          {t('common.loading')}
+                        </>
+                      ) : (
+                        <>
+                          <Download className="mr-2" size={18} />
+                          {t('dashboard.download')}
+                        </>
+                      )}
                     </Button>
                   </div>
                 </motion.div>
