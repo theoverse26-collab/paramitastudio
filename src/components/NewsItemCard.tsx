@@ -44,15 +44,15 @@ const NewsItemCard = ({ id, title, content, published_at, image_url, index }: Ne
           <div className="mb-2 text-sm text-muted-foreground font-medium uppercase tracking-wide">
             {new Date(published_at).toLocaleDateString()}
           </div>
-          <h3 className={`text-2xl font-bold mb-3 text-card-foreground group-hover:text-primary transition-colors ${isTranslating ? 'opacity-70' : ''}`}>
+          <h3 className={`text-2xl font-bold mb-3 text-card-foreground group-hover:text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary)/0.4)] ${isTranslating ? 'opacity-70' : ''}`}>
             {translated.title}
           </h3>
           <p className={`text-muted-foreground line-clamp-3 ${isTranslating ? 'opacity-70' : ''}`}>
             {translated.content}
           </p>
-          <div className="mt-4 flex items-center gap-2 text-primary font-semibold">
+          <div className="mt-4 inline-flex items-center gap-2 text-primary font-semibold group-hover:gap-3 transition-all duration-300">
             {t('news.readMore')}
-            <ArrowRight className="w-4 h-4 text-accent group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 transition-transform duration-300" />
           </div>
         </div>
       </Link>
