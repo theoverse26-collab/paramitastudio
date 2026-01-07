@@ -5,7 +5,56 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, MapPin } from "lucide-react";
+import { Mail, MapPin, HelpCircle } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+
+const faqData = [
+  {
+    question: "What kind of games do you make?",
+    answer: "We create 2D action-driven games with a strong emphasis on storytelling and original worlds. Our projects range from semi-open world adventures to linear, narrative-focused experiences, as well as hybrid designs that combine action combat with systems like tower defense. While genres may vary, every game we build prioritizes engaging gameplay, meaningful stories, and a distinct identity."
+  },
+  {
+    question: "Why do you use RPG Maker?",
+    answer: "RPG Maker is a powerful tool when used to its full potential. With years of experience, we are able to build custom systems, fast-paced action combat, and unique mechanics that go far beyond traditional turn-based RPGs. We choose RPG Maker because it allows us to focus on design, gameplay, and storytelling, while remaining efficient and flexible as a small studio."
+  },
+  {
+    question: "Are your games turn-based RPGs?",
+    answer: "No. While RPG Maker is often associated with turn-based combat, our games are primarily real-time action-based, including hack-and-slash and action battle systems. Each project is designed around the experience it needs—not a fixed formula."
+  },
+  {
+    question: "Why are your games priced so low?",
+    answer: "Our pricing reflects our development philosophy, not our quality. By keeping production costs efficient and leveraging existing resources responsibly, we are able to offer complete, polished games at accessible prices—typically between $1 and $3. We believe great games should be affordable without compromising the experience."
+  },
+  {
+    question: "Does low price mean short or low-quality games?",
+    answer: "No. Most of our games offer at least 3 hours of gameplay, often more depending on the design. More importantly, we apply high standards in design, polish, and testing, treating every project with the same care we would give a large-scale production."
+  },
+  {
+    question: "Do you use asset packs or original assets?",
+    answer: "We use a combination of community resources, licensed asset packs, and original content, always respecting creators and licenses. Assets are carefully selected and integrated to fit the game's world, tone, and identity, ensuring a cohesive and intentional experience."
+  },
+  {
+    question: "Are your games connected to each other?",
+    answer: "Some of our games may share themes, ideas, or universes, while others are completely standalone experiences. We design each game to be enjoyable on its own, without requiring prior knowledge of our other projects."
+  },
+  {
+    question: "What platforms do you develop for?",
+    answer: "We primarily focus on PC platforms, but platform support may vary depending on the project. Specific platform information is always provided on each game's individual page."
+  },
+  {
+    question: "How do you approach quality and testing?",
+    answer: "We develop with an AAA mindset, even at a small scale. This means iterative design, internal testing, careful balancing, and polishing until the experience feels right. Player feedback is also an important part of how we improve and refine our games."
+  },
+  {
+    question: "Do you plan to expand beyond RPG Maker in the future?",
+    answer: "We are always open to new tools and technologies if they help us deliver better experiences. However, our focus remains on making great games, not chasing engines. The tool is a means—not the goal."
+  }
+];
 
 const Contact = () => {
   const { t } = useTranslation();
@@ -96,6 +145,36 @@ const Contact = () => {
               </div>
             </motion.div>
           </div>
+
+          {/* FAQ Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="max-w-4xl mx-auto mt-20"
+          >
+            <div className="flex items-center gap-3 mb-8">
+              <HelpCircle className="w-8 h-8 text-accent" />
+              <h2 className="text-3xl font-bold">Frequently Asked Questions</h2>
+            </div>
+            
+            <Accordion type="single" collapsible className="space-y-3">
+              {faqData.map((faq, index) => (
+                <AccordionItem 
+                  key={index} 
+                  value={`item-${index}`}
+                  className="bg-card border border-border rounded-lg px-6 data-[state=open]:border-accent/50 transition-colors"
+                >
+                  <AccordionTrigger className="text-left font-semibold hover:no-underline hover:text-primary py-5">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-muted-foreground pb-5 leading-relaxed">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
         </section>
       </div>
 
