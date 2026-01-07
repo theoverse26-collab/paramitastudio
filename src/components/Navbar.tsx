@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, User, LogOut, Heart } from "lucide-react";
+import logoParamita from "@/assets/logo-paramita.png";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "./NavLink";
 import { Button } from "./ui/button";
@@ -17,8 +18,8 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-primary text-primary-foreground border-b border-primary-foreground/20">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
-          <Link to="/" className="text-2xl font-bold text-gradient-gold uppercase tracking-wider">
-            Paramita Studio
+          <Link to="/" className="flex items-center gap-2">
+            <img src={logoParamita} alt="Paramita Studio" className="h-12 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
