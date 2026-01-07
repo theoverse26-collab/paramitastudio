@@ -18,6 +18,7 @@ interface NewsPost {
   content: string;
   published_at: string;
   image_url: string | null;
+  body_images: string[] | null;
 }
 
 interface Comment {
@@ -72,6 +73,20 @@ const NewsDetailContent = ({ news }: { news: NewsPost }) => {
           {translated.content}
         </p>
       </div>
+
+      {news.body_images && news.body_images.length > 0 && (
+        <div className="mt-8 space-y-6">
+          {news.body_images.map((imageUrl, index) => (
+            <div key={index} className="rounded-xl overflow-hidden">
+              <img
+                src={imageUrl}
+                alt={`${translated.title} - Image ${index + 1}`}
+                className="w-full h-auto object-cover"
+              />
+            </div>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 };

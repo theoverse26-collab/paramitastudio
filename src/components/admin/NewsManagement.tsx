@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, X, ImagePlus } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -35,7 +35,9 @@ const NewsManagement = () => {
     title: '',
     content: '',
     image_url: '',
+    body_images: [] as string[],
   });
+  const [newBodyImageUrl, setNewBodyImageUrl] = useState('');
 
   useEffect(() => {
     fetchNews();
@@ -47,14 +49,17 @@ const NewsManagement = () => {
         title: editingPost.title,
         content: editingPost.content,
         image_url: editingPost.image_url || '',
+        body_images: (editingPost as any).body_images || [],
       });
     } else {
       setFormData({
         title: '',
         content: '',
         image_url: '',
+        body_images: [],
       });
     }
+    setNewBodyImageUrl('');
   }, [editingPost]);
 
   const fetchNews = async () => {
@@ -88,6 +93,7 @@ const NewsManagement = () => {
         title: formData.title,
         content: formData.content,
         image_url: formData.image_url || null,
+        body_images: formData.body_images,
         author_id: user.id,
       };
 
@@ -192,6 +198,58 @@ const NewsManagement = () => {
                   onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                   placeholder={t('admin.news.imagePlaceholder')}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>{t('admin.news.bodyImages') || 'Body Images'}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    value={newBodyImageUrl}
+                    onChange={(e) => setNewBodyImageUrl(e.target.value)}
+                    placeholder={t('admin.news.bodyImagePlaceholder') || 'Enter image URL and click Add'}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      if (newBodyImageUrl.trim()) {
+                        setFormData({
+                          ...formData,
+                          body_images: [...formData.body_images, newBodyImageUrl.trim()],
+                        });
+                        setNewBodyImageUrl('');
+                      }
+                    }}
+                  >
+                    <ImagePlus className="w-4 h-4 mr-1" />
+                    {t('common.add') || 'Add'}
+                  </Button>
+                </div>
+                {formData.body_images.length > 0 && (
+                  <div className="grid grid-cols-2 gap-2 mt-2">
+                    {formData.body_images.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <img
+                          src={url}
+                          alt={`Body image ${index + 1}`}
+                          className="w-full h-24 object-cover rounded border border-border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              body_images: formData.body_images.filter((_, i) => i !== index),
+                            });
+                          }}
+                          className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="content">{t('admin.news.content')}</Label>

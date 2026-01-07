@@ -1,5 +1,5 @@
-// Approximate exchange rate (you can update this or fetch live rates)
-const USD_TO_IDR_RATE = 16000;
+// Exchange rate USD to IDR (same as payment page)
+const USD_TO_IDR_RATE = 15000;
 
 export const formatPrice = (priceUsd: number, language: string): string => {
   if (language === 'id') {
