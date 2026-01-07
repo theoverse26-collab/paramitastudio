@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Heart, Trash2, ShoppingCart } from "lucide-react";
 import { motion } from "framer-motion";
+import { formatPrice } from "@/utils/currency";
 
 interface WishlistItem {
   id: string;
@@ -29,7 +30,7 @@ const Wishlist = () => {
   const navigate = useNavigate();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     if (authLoading) return;
@@ -162,7 +163,7 @@ const Wishlist = () => {
 
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-bold text-primary">
-                      ${item.games.price.toFixed(2)}
+                      {formatPrice(item.games.price, i18n.language)}
                     </span>
                     <div className="flex gap-2">
                       <Button

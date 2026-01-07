@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
+import { formatPrice } from "@/utils/currency";
 
 interface Game {
   id: string;
@@ -35,7 +36,7 @@ const GameDetail = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const { translated, isTranslating } = useGameTranslation({
     gameId: game?.id || '',
@@ -261,7 +262,7 @@ const GameDetail = () => {
 
                 <div className="mb-6">
                   <p className="text-muted-foreground mb-2">{t('gameDetail.price')}</p>
-                  <p className="text-4xl font-bold text-accent">${game.price}</p>
+                  <p className="text-4xl font-bold text-accent">{formatPrice(game.price, i18n.language)}</p>
                 </div>
 
                 <Button

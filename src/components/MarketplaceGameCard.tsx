@@ -4,6 +4,7 @@ import { ShoppingCart, Heart } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { useGameTranslation } from "@/hooks/useGameTranslation";
+import { formatPrice } from "@/utils/currency";
 
 interface MarketplaceGameCardProps {
   id: string;
@@ -30,7 +31,7 @@ const MarketplaceGameCard = ({
   onPurchase,
   index,
 }: MarketplaceGameCardProps) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { translated, isTranslating } = useGameTranslation({
     gameId: id,
     description,
@@ -65,7 +66,7 @@ const MarketplaceGameCard = ({
 
           <div>
             <div className="mb-4">
-              <p className="text-3xl font-bold text-accent">${price}</p>
+              <p className="text-3xl font-bold text-accent">{formatPrice(price, i18n.language)}</p>
             </div>
 
             <div className="flex gap-2">
