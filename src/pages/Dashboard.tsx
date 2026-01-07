@@ -83,16 +83,7 @@ const Dashboard = () => {
 
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
-  const handleDownload = async (fileUrl: string | null, gameTitle: string, purchaseId: string) => {
-    if (!fileUrl) {
-      toast({
-        title: t('dashboard.downloadNotAvailable'),
-        description: 'This game file is not available yet.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
+  const handleDownload = async (gameId: string, gameTitle: string, purchaseId: string) => {
     setDownloadingId(purchaseId);
     
     toast({
@@ -101,14 +92,13 @@ const Dashboard = () => {
     });
 
     try {
-      const response = await fetch(fileUrl);
-      
-      if (!response.ok) {
-        throw new Error('Download failed');
-      }
-      
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
+      const { data, error } = await supabase.functions.invoke('download-game', {
+        body: { game_id: gameId }
+      });
+
+      if (error) throw error;
+
+      const url = window.URL.createObjectURL(data);
       const link = document.createElement('a');
       link.href = url;
       link.download = `${gameTitle.replace(/[^a-zA-Z0-9]/g, '-')}.zip`;
@@ -195,7 +185,7 @@ const Dashboard = () => {
                       Purchased: {new Date(purchase.purchase_date).toLocaleDateString()}
                     </p>
                     <Button
-                      onClick={() => handleDownload(purchase.game.file_url, purchase.game.title, purchase.id)}
+                      onClick={() => handleDownload(purchase.game.id, purchase.game.title, purchase.id)}
                       className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                       disabled={downloadingId === purchase.id}
                     >
