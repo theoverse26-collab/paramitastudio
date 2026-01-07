@@ -47,7 +47,7 @@ const Navbar = () => {
                 onClick={() => navigate('/auth')}
                 variant="outline"
                 size="sm"
-                className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                className="border-accent text-primary-foreground hover:bg-accent hover:text-accent-foreground"
               >
                 {t('nav.login')}
               </Button>
