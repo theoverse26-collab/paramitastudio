@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Target, Eye, Heart, Gamepad2, BookOpen } from "lucide-react";
 import logoParamita from "@/assets/logo-paramita.png";
-
+import heroImage from "@/assets/hero-bg.jpg";
 const About = () => {
   const { t } = useTranslation();
 
@@ -14,8 +14,44 @@ const About = () => {
 
       <div className="pt-24 pb-20">
         {/* Logo Section */}
-        <section className="bg-primary py-16 mb-20">
-          <div className="container mx-auto px-4">
+        <section className="relative py-24 mb-20 overflow-hidden">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 z-0"
+            style={{
+              backgroundImage: `url(${heroImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 fantasy-gradient opacity-90" />
+          </div>
+
+          {/* Floating particles effect */}
+          <div className="absolute inset-0 z-10">
+            {[...Array(15)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-1 h-1 bg-accent rounded-full glow-gold"
+                initial={{
+                  x: `${Math.random() * 100}%`,
+                  y: `${Math.random() * 100}%`,
+                  opacity: 0
+                }}
+                animate={{
+                  y: [null, "-50px", "-100px"],
+                  opacity: [0, 1, 0]
+                }}
+                transition={{
+                  duration: 3 + Math.random() * 2,
+                  repeat: Infinity,
+                  delay: Math.random() * 5
+                }}
+              />
+            ))}
+          </div>
+
+          <div className="container mx-auto px-4 relative z-20">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
