@@ -361,9 +361,9 @@ const GamesManagement = () => {
                 className="w-24 h-24 object-cover rounded"
               />
               <div className="flex-1">
-                <h3 className="text-xl font-bold mb-1">{game.title}</h3>
-                <p className="text-accent text-sm mb-2">{game.genre}</p>
-                <p className="text-lg font-semibold text-accent">${game.price}</p>
+                <h3 className="text-xl font-bold mb-1 text-foreground">{game.title}</h3>
+                <p className="text-muted-foreground text-sm mb-2">{game.genre}</p>
+                <p className="text-lg font-semibold text-primary">${game.price}</p>
               </div>
               <div className="flex flex-col gap-2">
                 <Button

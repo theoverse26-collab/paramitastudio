@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, Download, Users, ShoppingCart } from 'lucide-react';
+import { formatPrice } from '@/utils/currency';
 
 interface AnalyticsData {
   totalSales: number;
@@ -19,7 +20,7 @@ const Analytics = () => {
     totalGames: 0,
   });
   const [loading, setLoading] = useState(true);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     fetchAnalytics();
@@ -73,11 +74,13 @@ const Analytics = () => {
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">{t('admin.analytics.totalRevenue')}</CardTitle>
-          <DollarSign className="h-4 w-4 text-accent" />
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <DollarSign className="h-4 w-4 text-primary" />
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-accent">
-            ${analytics.totalRevenue.toFixed(2)}
+          <div className="text-2xl font-bold text-foreground">
+            {formatPrice(analytics.totalRevenue, i18n.language)}
           </div>
         </CardContent>
       </Card>
@@ -85,30 +88,36 @@ const Analytics = () => {
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">{t('admin.analytics.totalSales')}</CardTitle>
-          <ShoppingCart className="h-4 w-4 text-accent" />
+          <div className="h-8 w-8 rounded-full bg-secondary/50 flex items-center justify-center">
+            <ShoppingCart className="h-4 w-4 text-secondary-foreground" />
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{analytics.totalSales}</div>
+          <div className="text-2xl font-bold text-foreground">{analytics.totalSales}</div>
         </CardContent>
       </Card>
 
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">{t('admin.analytics.registeredUsers')}</CardTitle>
-          <Users className="h-4 w-4 text-accent" />
+          <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+            <Users className="h-4 w-4 text-primary" />
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{analytics.totalUsers}</div>
+          <div className="text-2xl font-bold text-foreground">{analytics.totalUsers}</div>
         </CardContent>
       </Card>
 
       <Card className="bg-card border-border">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">{t('admin.analytics.gamesListed')}</CardTitle>
-          <Download className="h-4 w-4 text-accent" />
+          <div className="h-8 w-8 rounded-full bg-secondary/50 flex items-center justify-center">
+            <Download className="h-4 w-4 text-secondary-foreground" />
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{analytics.totalGames}</div>
+          <div className="text-2xl font-bold text-foreground">{analytics.totalGames}</div>
         </CardContent>
       </Card>
     </div>
