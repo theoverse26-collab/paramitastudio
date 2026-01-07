@@ -21,14 +21,6 @@ serve(async (req) => {
       );
     }
 
-    // If target is English, just return the original content
-    if (target_language === 'en') {
-      return new Response(
-        JSON.stringify({ title: title ?? '', content: content ?? '' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const lovableApiKey = Deno.env.get('LOVABLE_API_KEY');
@@ -93,6 +85,7 @@ serve(async (req) => {
     // Get language name for better translation
     const languageNames: Record<string, string> = {
       id: 'Indonesian',
+      en: 'English',
       ja: 'Japanese',
       ko: 'Korean',
       zh: 'Chinese',
@@ -100,9 +93,10 @@ serve(async (req) => {
     };
     const targetLangName = languageNames[target_language] || target_language;
 
-    // Translate using Lovable AI
+    // Translate using Lovable AI - supports bi-directional translation
     const promptParts = [
       `Translate the following news article text to ${targetLangName}.`,
+      `The source text may be in any language - detect it and translate to ${targetLangName}.`,
       `Return ONLY a JSON object with exactly two keys: "title" and "content".`,
       `Rules:`,
       `- If a field is missing/empty, return an empty string for that field.`,

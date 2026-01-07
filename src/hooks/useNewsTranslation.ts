@@ -24,8 +24,8 @@ export const useNewsTranslation = ({ newsId, title, content }: UseNewsTranslatio
   useEffect(() => {
     const currentLang = i18n.language;
 
-    // If English or no newsId, use original content
-    if (currentLang === 'en' || !newsId) {
+    // If no newsId, use original content
+    if (!newsId) {
       setTranslated({ title, content });
       return;
     }
