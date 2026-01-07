@@ -159,7 +159,8 @@
     "backToNews": "Kembali ke Berita"
   },
   "auth": {
-    "welcomeBack": "Selamat Datang Kembali",
+    "welcomeBack": "Selamat Datang Kembali!",
+    "welcomeBackSubtitle": "Selamat datang kembali di Paramita Studio",
     "createAccount": "Buat Akun",
     "forgotPasswordTitle": "Reset Password",
     "fullName": "Nama Lengkap",
@@ -171,7 +172,31 @@
     "noAccount": "Belum punya akun?",
     "haveAccount": "Sudah punya akun?",
     "forgotPassword": "Lupa password?",
-    "backToLogin": "Kembali ke login"
+    "backToLogin": "Kembali ke login",
+    "enterFullName": "Masukkan nama lengkap Anda",
+    "enterEmail": "Masukkan email Anda",
+    "enterPassword": "Masukkan password Anda",
+    "pleaseWait": "Mohon tunggu...",
+    "joinCommunity": "Bergabung dengan komunitas Paramita Studio",
+    "enterEmailReset": "Masukkan email Anda untuk menerima link reset",
+    "loginFailed": "Gagal Masuk",
+    "loginSuccess": "Berhasil masuk.",
+    "signupFailed": "Gagal Mendaftar",
+    "accountExists": "Akun Sudah Ada",
+    "accountExistsDesc": "Email ini sudah terdaftar. Silakan masuk.",
+    "accountCreated": "Akun Dibuat!",
+    "welcomeNew": "Selamat datang di Paramita Studio.",
+    "resetFailed": "Reset Gagal",
+    "checkEmail": "Periksa Email Anda",
+    "resetLinkSent": "Kami telah mengirimkan link reset password.",
+    "unexpectedError": "Terjadi kesalahan yang tidak terduga.",
+    "validation": {
+      "error": "Error Validasi",
+      "invalidEmail": "Alamat email tidak valid",
+      "emailTooLong": "Email terlalu panjang",
+      "passwordMin": "Password minimal 6 karakter",
+      "nameTooLong": "Nama terlalu panjang"
+    }
   },
   "dashboard": {
     "title": "Perpustakaan Game Saya",

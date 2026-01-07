@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -11,15 +12,10 @@ import { Eye, EyeOff } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-const authSchema = z.object({
-  email: z.string().email('Invalid email address').max(255, 'Email too long'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  fullName: z.string().max(100, 'Name too long').optional(),
-});
-
 type AuthMode = 'login' | 'signup' | 'forgot';
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [mode, setMode] = useState<AuthMode>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -30,16 +26,22 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const authSchema = z.object({
+    email: z.string().email(t('auth.validation.invalidEmail')).max(255, t('auth.validation.emailTooLong')),
+    password: z.string().min(6, t('auth.validation.passwordMin')),
+    fullName: z.string().max(100, t('auth.validation.nameTooLong')).optional(),
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       if (mode === 'forgot') {
-        const emailValidation = z.string().email('Invalid email address').safeParse(email);
+        const emailValidation = z.string().email(t('auth.validation.invalidEmail')).safeParse(email);
         if (!emailValidation.success) {
           toast({
-            title: 'Validation Error',
+            title: t('auth.validation.error'),
             description: emailValidation.error.errors[0].message,
             variant: 'destructive',
           });
@@ -50,14 +52,14 @@ const Auth = () => {
         const { error } = await resetPassword(email);
         if (error) {
           toast({
-            title: 'Reset Failed',
+            title: t('auth.resetFailed'),
             description: error.message,
             variant: 'destructive',
           });
         } else {
           toast({
-            title: 'Check Your Email',
-            description: 'We sent you a password reset link.',
+            title: t('auth.checkEmail'),
+            description: t('auth.resetLinkSent'),
           });
           setMode('login');
         }
@@ -69,7 +71,7 @@ const Auth = () => {
       const validation = authSchema.safeParse({ email, password, fullName });
       if (!validation.success) {
         toast({
-          title: 'Validation Error',
+          title: t('auth.validation.error'),
           description: validation.error.errors[0].message,
           variant: 'destructive',
         });
@@ -81,14 +83,14 @@ const Auth = () => {
         const { error } = await signIn(email, password);
         if (error) {
           toast({
-            title: 'Login Failed',
+            title: t('auth.loginFailed'),
             description: error.message,
             variant: 'destructive',
           });
         } else {
           toast({
-            title: 'Welcome Back!',
-            description: 'Successfully logged in.',
+            title: t('auth.welcomeBack'),
+            description: t('auth.loginSuccess'),
           });
           navigate('/dashboard');
         }
@@ -97,29 +99,29 @@ const Auth = () => {
         if (error) {
           if (error.message.includes('already registered')) {
             toast({
-              title: 'Account Exists',
-              description: 'This email is already registered. Please login instead.',
+              title: t('auth.accountExists'),
+              description: t('auth.accountExistsDesc'),
               variant: 'destructive',
             });
           } else {
             toast({
-              title: 'Signup Failed',
+              title: t('auth.signupFailed'),
               description: error.message,
               variant: 'destructive',
             });
           }
         } else {
           toast({
-            title: 'Account Created!',
-            description: 'Welcome to Paramita Studio.',
+            title: t('auth.accountCreated'),
+            description: t('auth.welcomeNew'),
           });
           navigate('/dashboard');
         }
       }
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.message || 'An unexpected error occurred.',
+        title: t('common.error'),
+        description: error.message || t('auth.unexpectedError'),
         variant: 'destructive',
       });
     } finally {
@@ -138,52 +140,52 @@ const Auth = () => {
         >
           <div className="bg-card border border-border rounded-xl p-8 shadow-elegant">
             <h1 className="text-3xl font-bold text-center mb-2 text-gradient-gold uppercase">
-              {mode === 'login' ? 'Login' : mode === 'signup' ? 'Sign Up' : 'Reset Password'}
+              {mode === 'login' ? t('auth.signIn') : mode === 'signup' ? t('auth.signUp') : t('auth.forgotPasswordTitle')}
             </h1>
             <p className="text-center text-muted-foreground mb-6">
               {mode === 'login' 
-                ? 'Welcome back to Paramita Studio' 
+                ? t('auth.welcomeBackSubtitle') 
                 : mode === 'signup' 
-                ? 'Join the Paramita Studio community'
-                : 'Enter your email to receive a reset link'}
+                ? t('auth.joinCommunity')
+                : t('auth.enterEmailReset')}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {mode === 'signup' && (
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Full Name</Label>
+                  <Label htmlFor="fullName">{t('auth.fullName')}</Label>
                   <Input
                     id="fullName"
                     type="text"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    placeholder="Enter your full name"
+                    placeholder={t('auth.enterFullName')}
                   />
                 </div>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t('auth.email')}</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
+                  placeholder={t('auth.enterEmail')}
                   required
                 />
               </div>
 
               {mode !== 'forgot' && (
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">{t('auth.password')}</Label>
                   <div className="relative">
                     <Input
                       id="password"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
+                      placeholder={t('auth.enterPassword')}
                       required
                       className="pr-10"
                     />
@@ -204,12 +206,12 @@ const Auth = () => {
                 disabled={loading}
               >
                 {loading 
-                  ? 'Please wait...' 
+                  ? t('auth.pleaseWait') 
                   : mode === 'login' 
-                  ? 'Login' 
+                  ? t('auth.signIn') 
                   : mode === 'signup' 
-                  ? 'Sign Up' 
-                  : 'Send Reset Link'}
+                  ? t('auth.signUp') 
+                  : t('auth.sendResetLink')}
               </Button>
             </form>
 
@@ -219,7 +221,7 @@ const Auth = () => {
                   onClick={() => setMode('forgot')}
                   className="text-muted-foreground hover:text-foreground text-sm transition-colors"
                 >
-                  Forgot your password?
+                  {t('auth.forgotPassword')}
                 </button>
               </div>
             )}
@@ -230,16 +232,16 @@ const Auth = () => {
                   onClick={() => setMode('login')}
                   className="text-primary hover:text-primary/80 text-sm font-medium transition-colors"
                 >
-                  Back to Login
+                  {t('auth.backToLogin')}
                 </button>
               ) : (
                 <p className="text-sm text-muted-foreground">
-                  {mode === 'login' ? "Don't have an account? " : 'Already have an account? '}
+                  {mode === 'login' ? t('auth.noAccount') + ' ' : t('auth.haveAccount') + ' '}
                   <button
                     onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
                     className="text-primary hover:text-primary/80 font-medium transition-colors"
                   >
-                    {mode === 'login' ? 'Sign up' : 'Login'}
+                    {mode === 'login' ? t('auth.signUp') : t('auth.signIn')}
                   </button>
                 </p>
               )}
