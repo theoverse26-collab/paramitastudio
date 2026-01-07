@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
@@ -40,6 +41,7 @@ const NewsDetail = () => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
   const { user, isAdmin } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (id) {
@@ -60,7 +62,7 @@ const NewsDetail = () => {
       setNews(data);
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: 'Failed to load news article',
         variant: 'destructive',
       });
@@ -79,7 +81,6 @@ const NewsDetail = () => {
 
       if (error) throw error;
 
-      // Fetch user emails for comments
       const userIds = [...new Set(commentsData?.map(c => c.user_id) || [])];
       const { data: profiles } = await supabase
         .from('profiles')
@@ -88,14 +89,12 @@ const NewsDetail = () => {
 
       const emailMap = new Map(profiles?.map(p => [p.id, p.email]) || []);
 
-      // Organize comments into threads
       const commentsWithEmails = commentsData?.map(c => ({
         ...c,
         user_email: emailMap.get(c.user_id) || 'Unknown User',
         replies: []
       })) || [];
 
-      // Build comment tree
       const topLevelComments: Comment[] = [];
       const commentMap = new Map<string, Comment>();
 
@@ -137,7 +136,7 @@ const NewsDetail = () => {
       if (error) throw error;
 
       toast({
-        title: 'Success',
+        title: t('common.success'),
         description: 'Comment posted successfully',
       });
 
@@ -151,7 +150,7 @@ const NewsDetail = () => {
       fetchComments();
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: 'Failed to post comment',
         variant: 'destructive',
       });
@@ -161,7 +160,7 @@ const NewsDetail = () => {
   };
 
   const handleDeleteComment = async (commentId: string) => {
-    if (!confirm('Are you sure you want to delete this comment?')) return;
+    if (!confirm(t('news.confirmDelete'))) return;
 
     try {
       const { error } = await supabase
@@ -172,14 +171,14 @@ const NewsDetail = () => {
       if (error) throw error;
 
       toast({
-        title: 'Success',
+        title: t('common.success'),
         description: 'Comment deleted',
       });
       
       fetchComments();
     } catch (error: any) {
       toast({
-        title: 'Error',
+        title: t('common.error'),
         description: 'Failed to delete comment',
         variant: 'destructive',
       });
@@ -205,7 +204,7 @@ const NewsDetail = () => {
                 className="text-xs"
               >
                 <Reply className="w-3 h-3 mr-1" />
-                Reply
+                {t('news.reply')}
               </Button>
             )}
             {(isAdmin || user?.id === comment.user_id) && (
@@ -222,11 +221,10 @@ const NewsDetail = () => {
         </div>
         <p className="text-foreground whitespace-pre-wrap">{comment.content}</p>
 
-        {/* Reply Form */}
         {replyingTo === comment.id && (
           <div className="mt-4 space-y-2">
             <Textarea
-              placeholder="Write a reply..."
+              placeholder={t('news.writeReply')}
               value={replyContent}
               onChange={(e) => setReplyContent(e.target.value)}
               className="bg-background min-h-[80px]"
@@ -238,7 +236,7 @@ const NewsDetail = () => {
                 disabled={submitting || !replyContent.trim()}
                 className="bg-accent text-accent-foreground hover:bg-accent/90"
               >
-                Post Reply
+                {t('news.postReply')}
               </Button>
               <Button
                 variant="outline"
@@ -248,14 +246,13 @@ const NewsDetail = () => {
                   setReplyContent("");
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Render replies */}
       {comment.replies?.map(reply => renderComment(reply, depth + 1))}
     </div>
   );
@@ -263,7 +260,7 @@ const NewsDetail = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground">{t('common.loading')}</p>
       </div>
     );
   }
@@ -273,9 +270,9 @@ const NewsDetail = () => {
       <div className="min-h-screen">
         <Navbar />
         <div className="pt-24 pb-20 container mx-auto px-4 text-center">
-          <h1 className="text-3xl font-bold mb-4">Article Not Found</h1>
+          <h1 className="text-3xl font-bold mb-4">{t('news.articleNotFound')}</h1>
           <Link to="/news" className="text-accent hover:underline">
-            Back to News
+            {t('news.backToNews')}
           </Link>
         </div>
         <Footer />
@@ -289,20 +286,18 @@ const NewsDetail = () => {
 
       <div className="pt-24 pb-20">
         <article className="container mx-auto px-4 max-w-4xl">
-          {/* Back Link */}
           <Link 
             to="/news" 
             className="inline-flex items-center gap-2 text-muted-foreground hover:text-accent transition-colors mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to News
+            {t('news.backToNews')}
           </Link>
 
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            {/* Header */}
             <header className="mb-8">
               <div className="text-sm text-accent font-semibold uppercase tracking-wide mb-4">
                 {new Date(news.published_at).toLocaleDateString('en-US', {
@@ -316,7 +311,6 @@ const NewsDetail = () => {
               </h1>
             </header>
 
-            {/* Featured Image */}
             {news.image_url && (
               <div className="mb-8 rounded-xl overflow-hidden">
                 <img 
@@ -327,7 +321,6 @@ const NewsDetail = () => {
               </div>
             )}
 
-            {/* Content */}
             <div className="prose prose-lg max-w-none">
               <p className="text-lg text-foreground leading-relaxed whitespace-pre-wrap">
                 {news.content}
@@ -335,7 +328,6 @@ const NewsDetail = () => {
             </div>
           </motion.div>
 
-          {/* Comments Section */}
           <motion.section
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -344,14 +336,13 @@ const NewsDetail = () => {
           >
             <div className="flex items-center gap-2 mb-8">
               <MessageCircle className="w-6 h-6 text-accent" />
-              <h2 className="text-2xl font-bold">Comments</h2>
+              <h2 className="text-2xl font-bold">{t('news.comments')}</h2>
             </div>
 
-            {/* New Comment Form */}
             {user ? (
               <div className="bg-card rounded-xl p-6 border border-border mb-8">
                 <Textarea
-                  placeholder="Share your thoughts..."
+                  placeholder={t('news.writeComment')}
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   className="bg-background min-h-[100px] mb-4"
@@ -361,27 +352,26 @@ const NewsDetail = () => {
                   disabled={submitting || !newComment.trim()}
                   className="bg-accent text-accent-foreground hover:bg-accent/90"
                 >
-                  Post Comment
+                  {t('news.postComment')}
                 </Button>
               </div>
             ) : (
               <div className="bg-card rounded-xl p-6 border border-border mb-8 text-center">
                 <p className="text-muted-foreground mb-4">
-                  Please sign in to leave a comment
+                  {t('news.loginToComment')}
                 </p>
                 <Link to="/auth">
                   <Button className="bg-accent text-accent-foreground hover:bg-accent/90">
-                    Sign In
+                    {t('nav.login')}
                   </Button>
                 </Link>
               </div>
             )}
 
-            {/* Comments List */}
             <div className="space-y-4">
               {comments.length === 0 ? (
                 <p className="text-muted-foreground text-center py-8">
-                  No comments yet. Be the first to share your thoughts!
+                  {t('news.noComments')}
                 </p>
               ) : (
                 comments.map(comment => renderComment(comment))
