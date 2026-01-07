@@ -29,7 +29,7 @@ const NewsItemCard = ({ id, title, content, published_at, image_url, index }: Ne
     >
       <Link 
         to={`/news/${id}`}
-        className="block bg-card rounded-xl overflow-hidden border border-border hover-lift parchment-card group transition-all duration-300"
+        className="block bg-card rounded-xl overflow-hidden border border-border border-l-4 border-l-accent hover-lift parchment-card group transition-all duration-300"
       >
         {image_url && (
           <div className="aspect-video overflow-hidden">
@@ -41,18 +41,18 @@ const NewsItemCard = ({ id, title, content, published_at, image_url, index }: Ne
           </div>
         )}
         <div className="p-8">
-          <div className="mb-2 text-sm text-accent font-semibold uppercase tracking-wide">
+          <div className="mb-2 text-sm text-muted-foreground font-medium uppercase tracking-wide">
             {new Date(published_at).toLocaleDateString()}
           </div>
-          <h3 className={`text-2xl font-bold mb-3 group-hover:text-accent transition-colors ${isTranslating ? 'opacity-70' : ''}`}>
+          <h3 className={`text-2xl font-bold mb-3 text-card-foreground group-hover:text-primary transition-colors ${isTranslating ? 'opacity-70' : ''}`}>
             {translated.title}
           </h3>
           <p className={`text-muted-foreground line-clamp-3 ${isTranslating ? 'opacity-70' : ''}`}>
             {translated.content}
           </p>
-          <div className="mt-4 flex items-center gap-2 text-accent font-semibold">
+          <div className="mt-4 flex items-center gap-2 text-primary font-semibold">
             {t('news.readMore')}
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            <ArrowRight className="w-4 h-4 text-accent group-hover:translate-x-1 transition-transform" />
           </div>
         </div>
       </Link>
