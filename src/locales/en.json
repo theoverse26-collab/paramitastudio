@@ -159,7 +159,8 @@
     "backToNews": "Back to News"
   },
   "auth": {
-    "welcomeBack": "Welcome Back",
+    "welcomeBack": "Welcome Back!",
+    "welcomeBackSubtitle": "Welcome back to Paramita Studio",
     "createAccount": "Create Account",
     "forgotPasswordTitle": "Reset Password",
     "fullName": "Full Name",
@@ -171,7 +172,31 @@
     "noAccount": "Don't have an account?",
     "haveAccount": "Already have an account?",
     "forgotPassword": "Forgot password?",
-    "backToLogin": "Back to login"
+    "backToLogin": "Back to login",
+    "enterFullName": "Enter your full name",
+    "enterEmail": "Enter your email",
+    "enterPassword": "Enter your password",
+    "pleaseWait": "Please wait...",
+    "joinCommunity": "Join the Paramita Studio community",
+    "enterEmailReset": "Enter your email to receive a reset link",
+    "loginFailed": "Login Failed",
+    "loginSuccess": "Successfully logged in.",
+    "signupFailed": "Signup Failed",
+    "accountExists": "Account Exists",
+    "accountExistsDesc": "This email is already registered. Please login instead.",
+    "accountCreated": "Account Created!",
+    "welcomeNew": "Welcome to Paramita Studio.",
+    "resetFailed": "Reset Failed",
+    "checkEmail": "Check Your Email",
+    "resetLinkSent": "We sent you a password reset link.",
+    "unexpectedError": "An unexpected error occurred.",
+    "validation": {
+      "error": "Validation Error",
+      "invalidEmail": "Invalid email address",
+      "emailTooLong": "Email too long",
+      "passwordMin": "Password must be at least 6 characters",
+      "nameTooLong": "Name too long"
+    }
   },
   "dashboard": {
     "title": "My Game Library",
