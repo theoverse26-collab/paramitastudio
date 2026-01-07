@@ -13,7 +13,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <Link to="/">
-              <img src={logoParamita} alt="Paramita Studio" className="h-16 w-auto mb-4" />
+              <img src={logoParamita} alt="Paramita Studio" className="h-28 w-auto mb-4" />
             </Link>
             <p className="text-sm opacity-90">
               {t('footer.description')}
