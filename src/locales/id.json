@@ -9,6 +9,7 @@
     "wishlist": "Wishlist",
     "inbox": "Kotak Masuk",
     "dashboard": "Dashboard",
+    "profile": "Profil",
     "admin": "Admin",
     "login": "Masuk",
     "logout": "Keluar"
@@ -218,10 +219,25 @@
     "success": "Berhasil",
     "cancel": "Batal",
     "save": "Simpan",
+    "saving": "Menyimpan...",
     "edit": "Edit",
     "delete": "Hapus",
     "submit": "Kirim",
-    "back": "Kembali"
+    "back": "Kembali",
+    "add": "Tambah"
+  },
+  "profile": {
+    "title": "Profil Saya",
+    "subtitle": "Lihat dan kelola informasi akun Anda",
+    "accountInfo": "Informasi Akun",
+    "accountInfoDesc": "Detail dan preferensi pribadi Anda",
+    "email": "Alamat Email",
+    "emailNote": "Email tidak dapat diubah",
+    "fullName": "Nama Lengkap",
+    "fullNamePlaceholder": "Masukkan nama lengkap Anda",
+    "memberSince": "Bergabung Sejak",
+    "saveChanges": "Simpan Perubahan",
+    "updateSuccess": "Profil berhasil diperbarui"
   },
   "language": {
     "en": "Inggris",

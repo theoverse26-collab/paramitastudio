@@ -9,6 +9,7 @@
     "wishlist": "Wishlist",
     "inbox": "Inbox",
     "dashboard": "Dashboard",
+    "profile": "Profile",
     "admin": "Admin",
     "login": "Login",
     "logout": "Logout"
@@ -218,10 +219,25 @@
     "success": "Success",
     "cancel": "Cancel",
     "save": "Save",
+    "saving": "Saving...",
     "edit": "Edit",
     "delete": "Delete",
     "submit": "Submit",
-    "back": "Back"
+    "back": "Back",
+    "add": "Add"
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "View and manage your account information",
+    "accountInfo": "Account Information",
+    "accountInfoDesc": "Your personal details and preferences",
+    "email": "Email Address",
+    "emailNote": "Email cannot be changed",
+    "fullName": "Full Name",
+    "fullNamePlaceholder": "Enter your full name",
+    "memberSince": "Member Since",
+    "saveChanges": "Save Changes",
+    "updateSuccess": "Profile updated successfully"
   },
   "language": {
     "en": "English",

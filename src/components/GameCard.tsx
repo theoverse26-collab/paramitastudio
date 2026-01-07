@@ -51,8 +51,8 @@ const GameCard = ({ id, title, genre, description, image, index }: GameCardProps
       </Link>
 
       <div className="p-4 group-hover:opacity-0 transition-opacity duration-300">
-        <h3 className="text-xl font-bold mb-1">{title}</h3>
-        <p className="text-accent text-sm font-semibold uppercase tracking-wide">{genre}</p>
+        <h3 className="text-xl font-bold mb-1 text-card-foreground">{title}</h3>
+        <p className="text-primary text-sm font-semibold uppercase tracking-wide">{genre}</p>
       </div>
     </motion.div>
   );
