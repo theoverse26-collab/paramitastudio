@@ -163,9 +163,9 @@ const GameDetail = () => {
     <div className="min-h-screen">
       <Navbar />
 
-      <div className="pt-24 pb-20">
+      <div className="pb-20">
         {/* Hero Banner */}
-        <section className="relative h-[60vh] mb-12">
+        <section className="relative h-[70vh] mb-12">
           <div
             className="absolute inset-0 bg-cover bg-center"
             style={{ backgroundImage: `url(${game.hero_image_url || game.image_url})` }}
