@@ -14,6 +14,18 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+interface BodyImage {
+  url: string;
+  position: 'middle' | 'bottom';
+}
 
 interface NewsPost {
   id: string;
@@ -21,6 +33,7 @@ interface NewsPost {
   content: string;
   published_at: string;
   image_url: string | null;
+  body_images: BodyImage[] | null;
 }
 
 const NewsManagement = () => {
@@ -35,9 +48,10 @@ const NewsManagement = () => {
     title: '',
     content: '',
     image_url: '',
-    body_images: [] as string[],
+    body_images: [] as BodyImage[],
   });
   const [newBodyImageUrl, setNewBodyImageUrl] = useState('');
+  const [newBodyImagePosition, setNewBodyImagePosition] = useState<'middle' | 'bottom'>('bottom');
 
   useEffect(() => {
     fetchNews();
@@ -45,11 +59,20 @@ const NewsManagement = () => {
 
   useEffect(() => {
     if (editingPost) {
+      // Handle legacy string[] format or new BodyImage[] format
+      const existingBodyImages = editingPost.body_images || [];
+      const normalizedImages: BodyImage[] = existingBodyImages.map((img: any) => {
+        if (typeof img === 'string') {
+          return { url: img, position: 'bottom' as const };
+        }
+        return img;
+      });
+      
       setFormData({
         title: editingPost.title,
         content: editingPost.content,
         image_url: editingPost.image_url || '',
-        body_images: (editingPost as any).body_images || [],
+        body_images: normalizedImages,
       });
     } else {
       setFormData({
@@ -60,6 +83,7 @@ const NewsManagement = () => {
       });
     }
     setNewBodyImageUrl('');
+    setNewBodyImagePosition('bottom');
   }, [editingPost]);
 
   const fetchNews = async () => {
@@ -70,7 +94,21 @@ const NewsManagement = () => {
         .order('published_at', { ascending: false });
 
       if (error) throw error;
-      setNews(data || []);
+      
+      // Parse body_images from JSON strings to BodyImage objects
+      const parsedNews = (data || []).map(post => ({
+        ...post,
+        body_images: (post.body_images || []).map((img: string) => {
+          try {
+            const parsed = JSON.parse(img);
+            return typeof parsed === 'object' ? parsed : { url: img, position: 'bottom' };
+          } catch {
+            return { url: img, position: 'bottom' };
+          }
+        }),
+      }));
+      
+      setNews(parsedNews as NewsPost[]);
     } catch (error: any) {
       toast({
         title: t('common.error'),
@@ -89,11 +127,12 @@ const NewsManagement = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
+      // Serialize body_images to JSON strings for storage
       const newsData = {
         title: formData.title,
         content: formData.content,
         image_url: formData.image_url || null,
-        body_images: formData.body_images,
+        body_images: formData.body_images.map(img => JSON.stringify(img)),
         author_id: user.id,
       };
 
@@ -200,14 +239,26 @@ const NewsManagement = () => {
                 />
               </div>
               <div className="space-y-2">
-                <Label>{t('admin.news.bodyImages') || 'Body Images'}</Label>
+                <Label>{t('admin.news.bodyImages') || 'Additional Images'}</Label>
                 <div className="flex gap-2">
                   <Input
                     value={newBodyImageUrl}
                     onChange={(e) => setNewBodyImageUrl(e.target.value)}
-                    placeholder={t('admin.news.bodyImagePlaceholder') || 'Enter image URL and click Add'}
+                    placeholder="Enter image URL"
                     className="flex-1"
                   />
+                  <Select
+                    value={newBodyImagePosition}
+                    onValueChange={(value: 'middle' | 'bottom') => setNewBodyImagePosition(value)}
+                  >
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="middle">Middle</SelectItem>
+                      <SelectItem value="bottom">Bottom</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Button
                     type="button"
                     variant="outline"
@@ -215,25 +266,31 @@ const NewsManagement = () => {
                       if (newBodyImageUrl.trim()) {
                         setFormData({
                           ...formData,
-                          body_images: [...formData.body_images, newBodyImageUrl.trim()],
+                          body_images: [...formData.body_images, { url: newBodyImageUrl.trim(), position: newBodyImagePosition }],
                         });
                         setNewBodyImageUrl('');
                       }
                     }}
                   >
                     <ImagePlus className="w-4 h-4 mr-1" />
-                    {t('common.add') || 'Add'}
+                    Add
                   </Button>
                 </div>
                 {formData.body_images.length > 0 && (
-                  <div className="grid grid-cols-2 gap-2 mt-2">
-                    {formData.body_images.map((url, index) => (
-                      <div key={index} className="relative group">
+                  <div className="space-y-2 mt-2">
+                    {formData.body_images.map((img, index) => (
+                      <div key={index} className="flex items-center gap-2 bg-muted/50 p-2 rounded border border-border">
                         <img
-                          src={url}
+                          src={img.url}
                           alt={`Body image ${index + 1}`}
-                          className="w-full h-24 object-cover rounded border border-border"
+                          className="w-16 h-12 object-cover rounded"
                         />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-muted-foreground truncate">{img.url}</p>
+                          <span className={`text-xs font-medium px-2 py-0.5 rounded ${img.position === 'middle' ? 'bg-blue-500/20 text-blue-400' : 'bg-green-500/20 text-green-400'}`}>
+                            {img.position === 'middle' ? 'In Content' : 'At Bottom'}
+                          </span>
+                        </div>
                         <button
                           type="button"
                           onClick={() => {
@@ -242,9 +299,9 @@ const NewsManagement = () => {
                               body_images: formData.body_images.filter((_, i) => i !== index),
                             });
                           }}
-                          className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="p-1 hover:bg-destructive/20 rounded transition-colors"
                         >
-                          <X className="w-3 h-3" />
+                          <X className="w-4 h-4 text-destructive" />
                         </button>
                       </div>
                     ))}

@@ -12,13 +12,18 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Trash2, MessageCircle, Reply } from "lucide-react";
 
+interface BodyImage {
+  url: string;
+  position: 'middle' | 'bottom';
+}
+
 interface NewsPost {
   id: string;
   title: string;
   content: string;
   published_at: string;
   image_url: string | null;
-  body_images: string[] | null;
+  body_images: BodyImage[] | null;
 }
 
 interface Comment {
@@ -39,6 +44,9 @@ const NewsDetailContent = ({ news }: { news: NewsPost }) => {
     title: news.title,
     content: news.content,
   });
+
+  const middleImages = news.body_images?.filter(img => img.position === 'middle') || [];
+  const bottomImages = news.body_images?.filter(img => img.position === 'bottom') || [];
 
   return (
     <motion.div
@@ -74,17 +82,36 @@ const NewsDetailContent = ({ news }: { news: NewsPost }) => {
         </p>
       </div>
 
-      {news.body_images && news.body_images.length > 0 && (
-        <div className="mt-8 space-y-6">
-          {news.body_images.map((imageUrl, index) => (
+      {/* Middle images - shown after content */}
+      {middleImages.length > 0 && (
+        <div className="my-8 space-y-6">
+          {middleImages.map((img, index) => (
             <div key={index} className="rounded-xl overflow-hidden">
               <img
-                src={imageUrl}
+                src={img.url}
                 alt={`${translated.title} - Image ${index + 1}`}
                 className="w-full h-auto object-cover"
               />
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Bottom images - gallery style like game screenshots */}
+      {bottomImages.length > 0 && (
+        <div className="mt-12">
+          <h3 className="text-2xl font-bold mb-6">{t('news.gallery') || 'Gallery'}</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {bottomImages.map((img, index) => (
+              <div key={index} className="rounded-xl overflow-hidden hover:scale-[1.02] transition-transform duration-300">
+                <img
+                  src={img.url}
+                  alt={`${translated.title} - Gallery ${index + 1}`}
+                  className="w-full h-auto object-cover"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </motion.div>
@@ -120,7 +147,25 @@ const NewsDetail = () => {
         .maybeSingle();
 
       if (error) throw error;
-      setNews(data);
+      
+      if (data) {
+        // Parse body_images from JSON strings to BodyImage objects
+        const parsedBodyImages = (data.body_images || []).map((img: string) => {
+          try {
+            const parsed = JSON.parse(img);
+            return typeof parsed === 'object' ? parsed : { url: img, position: 'bottom' };
+          } catch {
+            return { url: img, position: 'bottom' };
+          }
+        });
+        
+        setNews({
+          ...data,
+          body_images: parsedBodyImages,
+        } as NewsPost);
+      } else {
+        setNews(null);
+      }
     } catch (error: any) {
       toast({
         title: t('common.error'),
