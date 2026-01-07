@@ -19,6 +19,7 @@ interface NewsPost {
   title: string;
   content: string;
   published_at: string;
+  image_url: string | null;
 }
 
 const NewsManagement = () => {
@@ -31,6 +32,7 @@ const NewsManagement = () => {
   const [formData, setFormData] = useState({
     title: '',
     content: '',
+    image_url: '',
   });
 
   useEffect(() => {
@@ -42,11 +44,13 @@ const NewsManagement = () => {
       setFormData({
         title: editingPost.title,
         content: editingPost.content,
+        image_url: editingPost.image_url || '',
       });
     } else {
       setFormData({
         title: '',
         content: '',
+        image_url: '',
       });
     }
   }, [editingPost]);
@@ -81,6 +85,7 @@ const NewsManagement = () => {
       const newsData = {
         title: formData.title,
         content: formData.content,
+        image_url: formData.image_url || null,
         author_id: user.id,
       };
 
@@ -175,6 +180,15 @@ const NewsManagement = () => {
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="image_url">Image URL (optional)</Label>
+                <Input
+                  id="image_url"
+                  value={formData.image_url}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  placeholder="https://example.com/image.jpg"
                 />
               </div>
               <div className="space-y-2">

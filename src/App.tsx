@@ -11,6 +11,7 @@ import Games from "./pages/Games";
 import GameDetail from "./pages/GameDetail";
 import Marketplace from "./pages/Marketplace";
 import News from "./pages/News";
+import NewsDetail from "./pages/NewsDetail";
 import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/games/:id" element={<GameDetail />} />
               <Route path="/marketplace" element={<Marketplace />} />
               <Route path="/news" element={<News />} />
+              <Route path="/news/:id" element={<NewsDetail />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />

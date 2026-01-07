@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Twitter, Facebook, Instagram, Youtube } from "lucide-react";
+import { Instagram, Youtube, Linkedin } from "lucide-react";
 const Footer = () => {
   return <footer className="bg-primary text-primary-foreground mt-20">
       <div className="container mx-auto px-4 py-12">
@@ -38,17 +38,14 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4 text-accent">Follow Us</h4>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-accent transition-fantasy">
-                <Twitter size={20} />
-              </a>
-              <a href="#" className="hover:text-accent transition-fantasy">
-                <Facebook size={20} />
-              </a>
-              <a href="#" className="hover:text-accent transition-fantasy">
-                <Instagram size={20} />
-              </a>
-              <a href="#" className="hover:text-accent transition-fantasy">
+              <a href="https://www.youtube.com/@Alcuinex" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-fantasy">
                 <Youtube size={20} />
+              </a>
+              <a href="https://id.linkedin.com/company/alcuinex" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-fantasy">
+                <Linkedin size={20} />
+              </a>
+              <a href="https://www.instagram.com/alcuinex.official/" target="_blank" rel="noopener noreferrer" className="hover:text-accent transition-fantasy">
+                <Instagram size={20} />
               </a>
             </div>
           </div>

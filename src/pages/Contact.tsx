@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Mail, MapPin, Briefcase } from "lucide-react";
+import { Mail, MapPin } from "lucide-react";
 
 const Contact = () => {
   return (
@@ -22,7 +22,7 @@ const Contact = () => {
               Get In Touch
             </h1>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Have questions or want to join our team? We'd love to hear from you.
+              Have questions? We'd love to hear from you.
             </p>
           </motion.div>
 
@@ -76,8 +76,7 @@ const Contact = () => {
                     <Mail className="w-6 h-6 text-accent flex-shrink-0 mt-1" />
                     <div>
                       <p className="font-semibold mb-1">Email</p>
-                      <p className="text-muted-foreground">contact@paramitastudio.com</p>
-                      <p className="text-muted-foreground">support@paramitastudio.com</p>
+                      <p className="text-muted-foreground">alcuinex@gmail.com</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
@@ -85,41 +84,13 @@ const Contact = () => {
                     <div>
                       <p className="font-semibold mb-1">Location</p>
                       <p className="text-muted-foreground">
-                        Fantasy District, Creativity Boulevard<br />
-                        Game Development Plaza
+                        Pejaten Park Residence<br />
+                        Jl. Hj. Tutty Alawiyah No.21, Ragunan<br />
+                        Ps. Minggu, South Jakarta, Jakarta
                       </p>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Join Our Team */}
-              <div className="bg-card p-8 rounded-xl border border-border">
-                <div className="flex items-center gap-3 mb-4">
-                  <Briefcase className="w-8 h-8 text-accent" />
-                  <h2 className="text-3xl font-bold">Join Paramita Studio</h2>
-                </div>
-                <p className="text-muted-foreground mb-6">
-                  We're always looking for talented individuals who share our passion for creating 
-                  exceptional gaming experiences. Join our team of creative adventurers.
-                </p>
-                <div className="space-y-3">
-                  <div className="p-4 bg-background rounded-lg hover-lift border border-border">
-                    <h3 className="font-semibold mb-1">Game Designer</h3>
-                    <p className="text-sm text-muted-foreground">Full-time • Remote</p>
-                  </div>
-                  <div className="p-4 bg-background rounded-lg hover-lift border border-border">
-                    <h3 className="font-semibold mb-1">3D Artist</h3>
-                    <p className="text-sm text-muted-foreground">Full-time • On-site</p>
-                  </div>
-                  <div className="p-4 bg-background rounded-lg hover-lift border border-border">
-                    <h3 className="font-semibold mb-1">Sound Designer</h3>
-                    <p className="text-sm text-muted-foreground">Contract • Remote</p>
-                  </div>
-                </div>
-                <Button variant="outline" className="w-full mt-6 border-accent text-foreground hover:bg-accent/10">
-                  View All Openings
-                </Button>
               </div>
             </motion.div>
           </div>
