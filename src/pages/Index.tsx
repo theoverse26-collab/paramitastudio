@@ -5,7 +5,6 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import heroImage from "@/assets/hero-bg.jpg";
-import logoParamita from "@/assets/logo-paramita.png";
 import { Sparkles, Gamepad2, Users } from "lucide-react";
 
 const Index = () => {
@@ -165,25 +164,6 @@ const Index = () => {
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Logo Section */}
-      <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="flex justify-center"
-          >
-            <img 
-              src={logoParamita} 
-              alt="Paramita Studio" 
-              className="h-64 md:h-80 lg:h-96 w-auto"
-            />
-          </motion.div>
         </div>
       </section>
 

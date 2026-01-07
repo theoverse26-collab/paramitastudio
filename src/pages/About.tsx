@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Target, Eye, Heart, Gamepad2, BookOpen } from "lucide-react";
+import logoParamita from "@/assets/logo-paramita.png";
 
 const About = () => {
   const { t } = useTranslation();
@@ -12,6 +13,24 @@ const About = () => {
       <Navbar />
 
       <div className="pt-24 pb-20">
+        {/* Logo Section */}
+        <section className="bg-primary py-16 mb-20">
+          <div className="container mx-auto px-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              className="flex justify-center"
+            >
+              <img 
+                src={logoParamita} 
+                alt="Paramita Studio" 
+                className="h-64 md:h-80 lg:h-96 w-auto"
+              />
+            </motion.div>
+          </div>
+        </section>
+
         {/* Hero */}
         <section className="container mx-auto px-4 mb-20">
           <motion.div
