@@ -26,7 +26,7 @@ const LanguageSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <button
           type="button"
-          className="inline-flex items-center justify-center gap-1 rounded-full border border-primary-foreground/20 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-foreground backdrop-blur hover:bg-primary/15 transition-colors focus:outline-none focus:ring-0 focus-visible:ring-0"
+          className="inline-flex items-center justify-center gap-1 rounded-full border border-primary-foreground/20 bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-foreground backdrop-blur hover:bg-accent/20 hover:border-accent/50 hover:shadow-[0_0_10px_hsl(var(--accent)/0.3)] transition-all duration-200 focus:outline-none focus:ring-0 focus-visible:ring-0"
           aria-label="Change language"
         >
           <span aria-hidden className="text-base leading-none">{currentLanguage.flag}</span>
