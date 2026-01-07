@@ -10,10 +10,17 @@ interface NewsItemCardProps {
   content: string;
   published_at: string;
   image_url: string | null;
+  category?: string;
   index: number;
 }
 
-const NewsItemCard = ({ id, title, content, published_at, image_url, index }: NewsItemCardProps) => {
+// Helper to strip HTML tags and get plain text
+const stripHtml = (html: string): string => {
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  return doc.body.textContent || '';
+};
+
+const NewsItemCard = ({ id, title, content, published_at, image_url, category, index }: NewsItemCardProps) => {
   const { t } = useTranslation();
   const { translated, isTranslating } = useNewsTranslation({
     newsId: id,
@@ -21,38 +28,51 @@ const NewsItemCard = ({ id, title, content, published_at, image_url, index }: Ne
     content,
   });
 
+  // Strip HTML from content for preview
+  const plainTextContent = stripHtml(translated.content);
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1 }}
+      transition={{ delay: index * 0.05, duration: 0.3 }}
+      className="group"
     >
       <Link 
         to={`/news/${id}`}
-        className="block bg-card rounded-xl overflow-hidden border border-border border-l-4 border-l-accent hover-lift parchment-card group transition-all duration-300"
+        className="block bg-card rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 h-full"
       >
-        {image_url && (
-          <div className="aspect-video overflow-hidden">
+        <div className="aspect-[16/10] overflow-hidden bg-muted">
+          {image_url ? (
             <img 
               src={image_url} 
               alt={translated.title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             />
-          </div>
-        )}
-        <div className="p-8">
-          <div className="mb-2 text-sm text-muted-foreground font-medium uppercase tracking-wide">
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+              <span className="text-4xl">📰</span>
+            </div>
+          )}
+        </div>
+        <div className="p-5">
+          {category && category !== 'general' && (
+            <span className="inline-block px-2 py-1 text-xs font-medium uppercase tracking-wide bg-primary/10 text-primary rounded mb-2">
+              {category}
+            </span>
+          )}
+          <div className="text-xs text-muted-foreground mb-2">
             {new Date(published_at).toLocaleDateString()}
           </div>
-          <h3 className={`text-2xl font-bold mb-3 text-card-foreground group-hover:text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_8px_hsl(var(--primary)/0.4)] ${isTranslating ? 'opacity-70' : ''}`}>
+          <h3 className={`text-lg font-bold mb-2 text-card-foreground group-hover:text-primary transition-colors duration-300 line-clamp-2 ${isTranslating ? 'opacity-70' : ''}`}>
             {translated.title}
           </h3>
-          <p className={`text-muted-foreground line-clamp-3 ${isTranslating ? 'opacity-70' : ''}`}>
-            {translated.content}
+          <p className={`text-sm text-muted-foreground line-clamp-2 ${isTranslating ? 'opacity-70' : ''}`}>
+            {plainTextContent}
           </p>
-          <div className="mt-4 inline-flex items-center gap-2 text-primary font-semibold group-hover:gap-3 transition-all duration-300">
+          <div className="mt-3 inline-flex items-center gap-1 text-sm text-primary font-medium group-hover:gap-2 transition-all duration-300">
             {t('news.readMore')}
-            <ArrowRight className="w-4 h-4 transition-transform duration-300" />
+            <ArrowRight className="w-3 h-3" />
           </div>
         </div>
       </Link>

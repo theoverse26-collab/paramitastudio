@@ -94,12 +94,16 @@ serve(async (req) => {
     const targetLangName = languageNames[target_language] || target_language;
 
     // Translate using Lovable AI - supports bi-directional translation
+    // Note: Content may be HTML from TipTap editor - we need to preserve structure
     const promptParts = [
-      `Translate the following news article text to ${targetLangName}.`,
+      `Translate the following news article to ${targetLangName}.`,
       `The source text may be in any language - detect it and translate to ${targetLangName}.`,
       `Return ONLY a JSON object with exactly two keys: "title" and "content".`,
       `Rules:`,
       `- If a field is missing/empty, return an empty string for that field.`,
+      `- The content field may contain HTML tags. Preserve ALL HTML tags exactly as they are (like <p>, <img>, <h1>, <h2>, <ul>, <li>, <strong>, <em>, etc).`,
+      `- Only translate the text content between HTML tags, not the tags themselves or their attributes.`,
+      `- Keep all image URLs, links, and other attributes unchanged.`,
       `- Preserve paragraph breaks and formatting.`,
       `- No markdown, no code fences, JSON only.`,
       '',
