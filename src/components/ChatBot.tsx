@@ -152,9 +152,9 @@ export const ChatBot = () => {
             <Button
               onClick={() => setIsOpen(true)}
               size="lg"
-              className="h-14 w-14 rounded-full bg-accent hover:bg-accent/90 shadow-lg"
+              className="h-14 w-14 rounded-full bg-accent hover:bg-accent/90 shadow-lg border-2 border-primary ring-2 ring-primary/20"
             >
-              <MessageCircle className="h-6 w-6" />
+              <MessageCircle className="h-6 w-6 text-primary" />
             </Button>
           </motion.div>
         )}
@@ -249,9 +249,9 @@ export const ChatBot = () => {
                   onClick={handleSend}
                   disabled={!input.trim() || isLoading}
                   size="icon"
-                  className="bg-accent hover:bg-accent/90"
+                  className="bg-accent hover:bg-accent/90 border-2 border-primary"
                 >
-                  <Send className="h-4 w-4" />
+                  <Send className="h-4 w-4 text-primary" />
                 </Button>
               </div>
             </div>
