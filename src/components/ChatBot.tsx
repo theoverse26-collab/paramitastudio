@@ -173,8 +173,8 @@ export const ChatBot = () => {
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border bg-muted/50">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
-                  <Bot className="h-5 w-5 text-accent" />
+                <div className="h-10 w-10 rounded-full bg-accent flex items-center justify-center border-2 border-primary">
+                  <Bot className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground">Paramita AI</h3>
@@ -200,8 +200,8 @@ export const ChatBot = () => {
                     className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
                     {message.role === "assistant" && (
-                      <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-                        <Bot className="h-4 w-4 text-accent" />
+                      <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0 border-2 border-primary">
+                        <Bot className="h-4 w-4 text-primary" />
                       </div>
                     )}
                     <div
@@ -222,8 +222,8 @@ export const ChatBot = () => {
                 ))}
                 {isLoading && messages[messages.length - 1]?.role === "user" && (
                   <div className="flex gap-3 justify-start">
-                    <div className="h-8 w-8 rounded-full bg-accent/20 flex items-center justify-center flex-shrink-0">
-                      <Bot className="h-4 w-4 text-accent" />
+                    <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0 border-2 border-primary">
+                      <Bot className="h-4 w-4 text-primary" />
                     </div>
                     <div className="bg-muted rounded-2xl px-4 py-2.5">
                       <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
