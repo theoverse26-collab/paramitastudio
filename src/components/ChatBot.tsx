@@ -15,19 +15,29 @@ type Message = {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chatbot`;
 
 export const ChatBot = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! 👋 I'm Paramita Studio's AI assistant. Ask me about our games, latest news, or anything else!",
+      content: t('chatbot.welcomeMessage'),
     },
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Update welcome message when language changes
+  useEffect(() => {
+    setMessages([
+      {
+        role: "assistant",
+        content: t('chatbot.welcomeMessage'),
+      },
+    ]);
+  }, [i18n.language, t]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -48,7 +58,10 @@ export const ChatBot = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ messages: userMessages }),
+      body: JSON.stringify({ 
+        messages: userMessages,
+        language: i18n.language 
+      }),
     });
 
     if (!resp.ok) {
@@ -118,13 +131,13 @@ export const ChatBot = () => {
     } catch (error) {
       console.error("Chat error:", error);
       toast({
-        title: "Error",
+        title: t('resetPassword.error'),
         description: error instanceof Error ? error.message : "Failed to send message",
         variant: "destructive",
       });
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Sorry, I encountered an error. Please try again." },
+        { role: "assistant", content: t('chatbot.errorMessage') },
       ]);
     } finally {
       setIsLoading(false);
@@ -177,8 +190,8 @@ export const ChatBot = () => {
                   <Bot className="h-5 w-5 text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-foreground">Paramita AI</h3>
-                  <p className="text-xs text-muted-foreground">Ask me anything</p>
+                  <h3 className="font-semibold text-foreground">{t('chatbot.title')}</h3>
+                  <p className="text-xs text-muted-foreground">{t('chatbot.subtitle')}</p>
                 </div>
               </div>
               <Button
@@ -241,7 +254,7 @@ export const ChatBot = () => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyPress}
-                  placeholder="Type a message..."
+                  placeholder={t('chatbot.placeholder')}
                   disabled={isLoading}
                   className="flex-1"
                 />
