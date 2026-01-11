@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, language = 'en' } = await req.json();
+    const { messages } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -54,21 +54,13 @@ serve(async (req) => {
       `News: "${n.title}" (${n.category}) - Published: ${new Date(n.published_at).toLocaleDateString()}. Content: ${n.content?.substring(0, 300)}...`
     ).join("\n\n") || "No news available.";
 
-    // Language instruction based on user's selected language
-    const languageInstruction = language === 'id' 
-      ? `=== LANGUAGE INSTRUCTION ===
-IMPORTANT: You MUST respond in Indonesian (Bahasa Indonesia). The user has selected Indonesian as their preferred language. 
-All your responses should be in proper Indonesian language.
-
-`
-      : `=== LANGUAGE INSTRUCTION ===
-Respond in English.
-
-`;
 
     const systemPrompt = `You are a helpful AI assistant for Paramita Studio, an indie game development studio. You help users with questions about games, news, and everything about the studio.
 
-${languageInstruction}=== STUDIO INFORMATION ===
+=== LANGUAGE INSTRUCTION ===
+You are multilingual. Respond in the same language the user uses. If they write in Indonesian, respond in Indonesian. If they write in English, respond in English. Match the user's language naturally.
+
+=== STUDIO INFORMATION ===
 - Name: Paramita Studio
 - Tagline: "Crafting Worlds, One Story at a Time"
 - Email: studio.paramita@gmail.com
@@ -154,7 +146,7 @@ ${newsContext}
 - For purchase inquiries, direct users to the Marketplace page
 - For technical support or other inquiries, suggest using the Contact page`;
 
-    console.log("Sending request to Lovable AI with context from", games?.length || 0, "games and", news?.length || 0, "news articles. Language:", language);
+    console.log("Sending request to Lovable AI with context from", games?.length || 0, "games and", news?.length || 0, "news articles");
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
