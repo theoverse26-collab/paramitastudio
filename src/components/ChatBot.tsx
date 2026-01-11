@@ -15,35 +15,27 @@ type Message = {
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chatbot`;
 
 export const ChatBot = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "assistant",
-      content: t('chatbot.welcomeMessage'),
-    },
-  ]);
+  // Store only conversation messages (excluding welcome message)
+  const [conversationMessages, setConversationMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Update welcome message when language changes
-  useEffect(() => {
-    setMessages([
-      {
-        role: "assistant",
-        content: t('chatbot.welcomeMessage'),
-      },
-    ]);
-  }, [i18n.language, t]);
+  // Combine welcome message (always translated) with conversation messages
+  const displayMessages: Message[] = [
+    { role: "assistant", content: t('chatbot.welcomeMessage') },
+    ...conversationMessages,
+  ];
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [displayMessages]);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -58,10 +50,7 @@ export const ChatBot = () => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
       },
-      body: JSON.stringify({ 
-        messages: userMessages,
-        language: i18n.language 
-      }),
+      body: JSON.stringify({ messages: userMessages }),
     });
 
     if (!resp.ok) {
@@ -99,9 +88,9 @@ export const ChatBot = () => {
           const content = parsed.choices?.[0]?.delta?.content;
           if (content) {
             assistantContent += content;
-            setMessages((prev) => {
+            setConversationMessages((prev) => {
               const last = prev[prev.length - 1];
-              if (last?.role === "assistant" && prev.length > 1) {
+              if (last?.role === "assistant") {
                 return prev.map((m, i) =>
                   i === prev.length - 1 ? { ...m, content: assistantContent } : m
                 );
@@ -121,13 +110,14 @@ export const ChatBot = () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage: Message = { role: "user", content: input.trim() };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    const updatedConversation = [...conversationMessages, userMessage];
+    setConversationMessages(updatedConversation);
     setInput("");
     setIsLoading(true);
 
     try {
-      await streamChat(updatedMessages.filter((m) => m.role !== "assistant" || updatedMessages.indexOf(m) !== 0));
+      // Send only conversation messages to API (not the welcome message)
+      await streamChat(updatedConversation);
     } catch (error) {
       console.error("Chat error:", error);
       toast({
@@ -135,7 +125,7 @@ export const ChatBot = () => {
         description: error instanceof Error ? error.message : "Failed to send message",
         variant: "destructive",
       });
-      setMessages((prev) => [
+      setConversationMessages((prev) => [
         ...prev,
         { role: "assistant", content: t('chatbot.errorMessage') },
       ]);
@@ -207,7 +197,7 @@ export const ChatBot = () => {
             {/* Messages */}
             <ScrollArea className="flex-1 p-4" ref={scrollRef}>
               <div className="space-y-4">
-                {messages.map((message, index) => (
+                {displayMessages.map((message, index) => (
                   <div
                     key={index}
                     className={`flex gap-3 ${message.role === "user" ? "justify-end" : "justify-start"}`}
@@ -233,7 +223,7 @@ export const ChatBot = () => {
                     )}
                   </div>
                 ))}
-                {isLoading && messages[messages.length - 1]?.role === "user" && (
+                {isLoading && displayMessages[displayMessages.length - 1]?.role === "user" && (
                   <div className="flex gap-3 justify-start">
                     <div className="h-8 w-8 rounded-full bg-accent flex items-center justify-center flex-shrink-0 border-2 border-primary">
                       <Bot className="h-4 w-4 text-primary" />
