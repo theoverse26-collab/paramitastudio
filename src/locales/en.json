@@ -233,11 +233,32 @@
     "backToGames": "Back to Games"
   },
   "resetPassword": {
-    "title": "Reset Your Password",
+    "title": "Reset Password",
+    "subtitle": "Enter your new password below",
     "newPassword": "New Password",
+    "newPasswordPlaceholder": "Enter new password",
     "confirmPassword": "Confirm Password",
+    "confirmPasswordPlaceholder": "Confirm new password",
     "updatePassword": "Update Password",
-    "verifying": "Verifying reset link..."
+    "updating": "Updating...",
+    "verifying": "Verifying reset link...",
+    "invalidLink": "Invalid or Expired Link",
+    "invalidLinkDesc": "Please request a new password reset link.",
+    "validationError": "Validation Error",
+    "passwordMinLength": "Password must be at least 6 characters",
+    "passwordMismatch": "Passwords don't match",
+    "updateFailed": "Update Failed",
+    "passwordUpdated": "Password Updated!",
+    "passwordUpdatedDesc": "Your password has been successfully changed.",
+    "error": "Error",
+    "unexpectedError": "An unexpected error occurred."
+  },
+  "chatbot": {
+    "title": "Paramita AI",
+    "subtitle": "Ask me anything",
+    "welcomeMessage": "Hi! 👋 I'm Paramita Studio's AI assistant. Ask me about our games, latest news, or anything else!",
+    "placeholder": "Type a message...",
+    "errorMessage": "Sorry, I encountered an error. Please try again."
   },
   "common": {
     "loading": "Loading...",

@@ -6,19 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
-const passwordSchema = z.object({
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
-});
-
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,13 +20,20 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  const passwordSchema = z.object({
+    password: z.string().min(6, t('resetPassword.passwordMinLength')),
+    confirmPassword: z.string(),
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: t('resetPassword.passwordMismatch'),
+    path: ['confirmPassword'],
+  });
+
   useEffect(() => {
-    // If user landed here without a session (invalid/expired link), show error
     const timer = setTimeout(() => {
       if (!session) {
         toast({
-          title: 'Invalid or Expired Link',
-          description: 'Please request a new password reset link.',
+          title: t('resetPassword.invalidLink'),
+          description: t('resetPassword.invalidLinkDesc'),
           variant: 'destructive',
         });
         navigate('/auth');
@@ -40,7 +41,7 @@ const ResetPassword = () => {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [session, navigate, toast]);
+  }, [session, navigate, toast, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +51,7 @@ const ResetPassword = () => {
       const validation = passwordSchema.safeParse({ password, confirmPassword });
       if (!validation.success) {
         toast({
-          title: 'Validation Error',
+          title: t('resetPassword.validationError'),
           description: validation.error.errors[0].message,
           variant: 'destructive',
         });
@@ -62,21 +63,21 @@ const ResetPassword = () => {
       
       if (error) {
         toast({
-          title: 'Update Failed',
+          title: t('resetPassword.updateFailed'),
           description: error.message,
           variant: 'destructive',
         });
       } else {
         toast({
-          title: 'Password Updated!',
-          description: 'Your password has been successfully changed.',
+          title: t('resetPassword.passwordUpdated'),
+          description: t('resetPassword.passwordUpdatedDesc'),
         });
         navigate('/dashboard');
       }
     } catch (error: any) {
       toast({
-        title: 'Error',
-        description: error.message || 'An unexpected error occurred.',
+        title: t('resetPassword.error'),
+        description: error.message || t('resetPassword.unexpectedError'),
         variant: 'destructive',
       });
     } finally {
@@ -94,7 +95,7 @@ const ResetPassword = () => {
             animate={{ opacity: 1 }}
             className="text-center"
           >
-            <p className="text-muted-foreground">Verifying reset link...</p>
+            <p className="text-muted-foreground">{t('resetPassword.verifying')}</p>
           </motion.div>
         </div>
         <Footer />
@@ -113,33 +114,33 @@ const ResetPassword = () => {
         >
           <div className="bg-card border border-border rounded-xl p-8 shadow-elegant">
             <h1 className="text-3xl font-bold text-center mb-2 text-gradient-gold uppercase">
-              Reset Password
+              {t('resetPassword.title')}
             </h1>
             <p className="text-center text-muted-foreground mb-6">
-              Enter your new password below
+              {t('resetPassword.subtitle')}
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="password">New Password</Label>
+                <Label htmlFor="password">{t('resetPassword.newPassword')}</Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter new password"
+                  placeholder={t('resetPassword.newPasswordPlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Label htmlFor="confirmPassword">{t('resetPassword.confirmPassword')}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirm new password"
+                  placeholder={t('resetPassword.confirmPasswordPlaceholder')}
                   required
                 />
               </div>
@@ -149,7 +150,7 @@ const ResetPassword = () => {
                 className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
                 disabled={loading}
               >
-                {loading ? 'Updating...' : 'Update Password'}
+                {loading ? t('resetPassword.updating') : t('resetPassword.updatePassword')}
               </Button>
             </form>
           </div>

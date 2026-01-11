@@ -233,11 +233,32 @@
     "backToGames": "Kembali ke Game"
   },
   "resetPassword": {
-    "title": "Reset Password Anda",
+    "title": "Reset Password",
+    "subtitle": "Masukkan password baru Anda di bawah",
     "newPassword": "Password Baru",
+    "newPasswordPlaceholder": "Masukkan password baru",
     "confirmPassword": "Konfirmasi Password",
+    "confirmPasswordPlaceholder": "Konfirmasi password baru",
     "updatePassword": "Perbarui Password",
-    "verifying": "Memverifikasi link reset..."
+    "updating": "Memperbarui...",
+    "verifying": "Memverifikasi link reset...",
+    "invalidLink": "Link Tidak Valid atau Kedaluwarsa",
+    "invalidLinkDesc": "Silakan minta link reset password baru.",
+    "validationError": "Error Validasi",
+    "passwordMinLength": "Password minimal 6 karakter",
+    "passwordMismatch": "Password tidak cocok",
+    "updateFailed": "Gagal Memperbarui",
+    "passwordUpdated": "Password Diperbarui!",
+    "passwordUpdatedDesc": "Password Anda telah berhasil diubah.",
+    "error": "Error",
+    "unexpectedError": "Terjadi kesalahan yang tidak terduga."
+  },
+  "chatbot": {
+    "title": "Paramita AI",
+    "subtitle": "Tanyakan apa saja",
+    "welcomeMessage": "Hai! 👋 Saya asisten AI Paramita Studio. Tanyakan tentang game kami, berita terbaru, atau hal lainnya!",
+    "placeholder": "Ketik pesan...",
+    "errorMessage": "Maaf, terjadi kesalahan. Silakan coba lagi."
   },
   "common": {
     "loading": "Memuat...",
