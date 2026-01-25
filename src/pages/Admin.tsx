@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import GamesManagement from '@/components/admin/GamesManagement';
 import NewsManagement from '@/components/admin/NewsManagement';
 import Analytics from '@/components/admin/Analytics';
+import TransactionHistory from '@/components/admin/TransactionHistory';
 
 const Admin = () => {
   const { user, loading: authLoading, isAdmin } = useAuth();
@@ -58,10 +59,11 @@ const Admin = () => {
           </motion.div>
 
           <Tabs defaultValue="games" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-8">
+            <TabsList className="grid w-full grid-cols-4 mb-8">
               <TabsTrigger value="games">{t('admin.tabs.games')}</TabsTrigger>
               <TabsTrigger value="news">{t('admin.tabs.news')}</TabsTrigger>
               <TabsTrigger value="analytics">{t('admin.tabs.analytics')}</TabsTrigger>
+              <TabsTrigger value="transactions">{t('admin.tabs.transactions')}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="games">
@@ -74,6 +76,10 @@ const Admin = () => {
 
             <TabsContent value="analytics">
               <Analytics />
+            </TabsContent>
+
+            <TabsContent value="transactions">
+              <TransactionHistory />
             </TabsContent>
           </Tabs>
         </section>

@@ -297,7 +297,28 @@
     "tabs": {
       "games": "Game",
       "news": "Berita",
-      "analytics": "Analitik"
+      "analytics": "Analitik",
+      "transactions": "Transaksi"
+    },
+    "transactions": {
+      "title": "Riwayat Transaksi",
+      "loading": "Memuat transaksi...",
+      "noTransactions": "Tidak ada transaksi ditemukan",
+      "id": "ID Transaksi",
+      "date": "Tanggal",
+      "customer": "Pelanggan",
+      "game": "Game",
+      "amount": "Jumlah",
+      "status": "Status",
+      "gateway": "Gateway",
+      "invoice": "Invoice",
+      "filterAll": "Semua Status",
+      "filterCompleted": "Selesai",
+      "filterPending": "Menunggu",
+      "filterFailed": "Gagal",
+      "statusCompleted": "Selesai",
+      "statusPending": "Menunggu",
+      "statusFailed": "Gagal"
     },
     "games": {
       "loading": "Memuat game...",
