@@ -297,7 +297,28 @@
     "tabs": {
       "games": "Games",
       "news": "News",
-      "analytics": "Analytics"
+      "analytics": "Analytics",
+      "transactions": "Transactions"
+    },
+    "transactions": {
+      "title": "Transaction History",
+      "loading": "Loading transactions...",
+      "noTransactions": "No transactions found",
+      "id": "Transaction ID",
+      "date": "Date",
+      "customer": "Customer",
+      "game": "Game",
+      "amount": "Amount",
+      "status": "Status",
+      "gateway": "Gateway",
+      "invoice": "Invoice",
+      "filterAll": "All Status",
+      "filterCompleted": "Completed",
+      "filterPending": "Pending",
+      "filterFailed": "Failed",
+      "statusCompleted": "Completed",
+      "statusPending": "Pending",
+      "statusFailed": "Failed"
     },
     "games": {
       "loading": "Loading games...",
